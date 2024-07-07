@@ -1,5 +1,8 @@
 # Create your views here.
+from django.conf import settings
 from django.shortcuts import render
+
+from .parse_csv import read_player_stats
 
 
 def home(request):
@@ -15,4 +18,5 @@ def live_draft(request):
 
 
 def statistics(request):
-    return render(request, "draft/statistics.html")
+    players = read_player_stats(settings.CSV_FILE_PATH)
+    return render(request, "draft/statistics.html", {"players": players.values()})

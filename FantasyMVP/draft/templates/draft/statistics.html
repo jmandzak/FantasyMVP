@@ -1,25 +1,40 @@
+<!-- draft/templates/draft/statistics.html -->
+
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Coming Soon</title>
-    <style>
-        body {
-            text-align: center;
-            padding: 100px;
-            font-family: Arial, sans-serif;
-        }
-        h1 {
-            font-size: 36px;
-            margin-bottom: 30px;
-        }
-        p {
-            font-size: 18px;
-            margin-bottom: 20px;
-        }
-    </style>
+    <title>Player Statistics</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'draft/styles.css' %}">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="{% static 'draft/script.js' %}"></script>
 </head>
 <body>
-    <h1>Coming Soon</h1>
-    <p>This page is a soon-to-be-released feature. Please check back later for updates.</p>
+    <h1>Player Statistics</h1>
+    
+    {% if error_message %}
+        <p>{{ error_message }}</p>
+    {% else %}
+        <table id="playersTable">
+            <thead>
+                <tr>
+                    <th data-type="string">Name</th>
+                    <th data-type="string">Position</th>
+                    <th data-type="string">Team</th>
+                    <th data-type="number">Average Rank</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for player in players %}
+                    <tr>
+                        <td>{{ player.basic_info.name }}</td>
+                        <td>{{ player.basic_info.position }}</td>
+                        <td>{{ player.basic_info.team }}</td>
+                        <td>{{ player.basic_info.average_rank }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
 </body>
 </html>

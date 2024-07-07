@@ -1,12 +1,9 @@
 # Create your views here.
 from django.shortcuts import render
 
-from .models import Player
-
 
 def home(request):
-    players = Player.objects.all()
-    return render(request, "draft/home.html", {"players": players})
+    return render(request, "draft/home.html")
 
 
 def mock_draft(request):

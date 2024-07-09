@@ -3,12 +3,16 @@ from __future__ import annotations
 import dataclasses
 import typing
 
+import typing_extensions
+
 
 class Player:
     def __init__(self, csv_row: typing.Dict[str, typing.Any]) -> None:
         self.basic_info = BasicInfo.from_csv_row(csv_row)
-        self.position_stats = PositionStats.from_csv_row(csv_row)
+        self.standard_stats = StandardStats.from_csv_row(csv_row)
         self.ppr_stats = PPRStats.from_csv_row(csv_row)
+        if self.basic_info.position in ["QB", "DEF", "K"]:
+            self.ppr_stats = self.standard_stats
         self.quarterback_stats = PassingStats.from_csv_row(csv_row)
         self.runningback_stats = RushingStats.from_csv_row(csv_row)
         self.receiver_stats = ReceivingStats.from_csv_row(csv_row)
@@ -31,8 +35,24 @@ class PassingStats:
     average_touchdowns: float
     average_yards: float
 
-    @property
-    def all_stat_labels(self) -> typing.List[str]:
+    def get_values_as_list(self) -> typing.List[typing.Any]:
+        return [
+            self.attempts,
+            self.completions,
+            self.interceptions,
+            self.completion_percent,
+            self.touchdowns,
+            self.yards,
+            self.average_attempts,
+            self.average_completions,
+            self.average_interceptions,
+            self.average_completion_percent,
+            self.average_touchdowns,
+            self.average_yards,
+        ]
+
+    @staticmethod
+    def all_stat_labels() -> typing.List[str]:
         return [
             "Passing Attempts",
             "Passing Completions",
@@ -75,8 +95,18 @@ class RushingStats:
     average_touchdowns: float
     average_yards: float
 
-    @property
-    def all_stat_labels(self) -> typing.List[str]:
+    def get_values_as_list(self) -> typing.List[typing.Any]:
+        return [
+            self.attempts,
+            self.touchdowns,
+            self.yards,
+            self.average_attempts,
+            self.average_touchdowns,
+            self.average_yards,
+        ]
+
+    @staticmethod
+    def all_stat_labels() -> typing.List[str]:
         return [
             "Rushing Attempts",
             "Rushing Touchdowns",
@@ -109,17 +139,29 @@ class ReceivingStats:
     average_yards: float
     average_targets: float
 
-    @property
-    def all_stat_labels(self) -> typing.List[str]:
+    def get_values_as_list(self) -> typing.List[typing.Any]:
         return [
-            "Receiving Receptions",
+            self.receptions,
+            self.touchdowns,
+            self.yards,
+            self.targets,
+            self.average_receptions,
+            self.average_touchdowns,
+            self.average_yards,
+            self.average_targets,
+        ]
+
+    @staticmethod
+    def all_stat_labels() -> typing.List[str]:
+        return [
+            "Receptions",
             "Receiving Touchdowns",
             "Receiving Yards",
-            "Receiving Targets",
-            "Average Receiving Receptions",
+            "Targets",
+            "Average Receptions",
             "Average Receiving Touchdowns",
             "Average Receiving Yards",
-            "Average Receiving Targets",
+            "Average Targets",
         ]
 
     @staticmethod
@@ -155,8 +197,28 @@ class DefenseStats:
     average_sacks: float
     average_safeties: float
 
-    @property
-    def all_stat_labels(self) -> typing.List[str]:
+    def get_values_as_list(self) -> typing.List[typing.Any]:
+        return [
+            self.blocked_kicks,
+            self.touchdowns,
+            self.fumble_recoveries,
+            self.interceptions,
+            self.points_against,
+            self.return_touchdowns,
+            self.sacks,
+            self.safeties,
+            self.average_blocked_kicks,
+            self.average_touchdowns,
+            self.average_fumble_recoveries,
+            self.average_interceptions,
+            self.average_points_against,
+            self.average_return_touchdowns,
+            self.average_sacks,
+            self.average_safeties,
+        ]
+
+    @staticmethod
+    def all_stat_labels() -> typing.List[str]:
         return [
             "Blocked Kicks",
             "Touchdowns",
@@ -217,8 +279,28 @@ class KickerStats:
     fg_40_49_average: float
     fg_50_plus_average: float
 
-    @property
-    def all_stat_labels(self) -> typing.List[str]:
+    def get_values_as_list(self) -> typing.List[typing.Any]:
+        return [
+            self.field_goals_made,
+            self.extra_points_made,
+            self.extra_points_attempted,
+            self.average_extra_points_made,
+            self.average_extra_points_attempted,
+            self.average_field_goals_made,
+            self.fg_0_19,
+            self.fg_20_29,
+            self.fg_30_39,
+            self.fg_40_49,
+            self.fg_50_plus,
+            self.fg_0_19_average,
+            self.fg_20_29_average,
+            self.fg_30_39_average,
+            self.fg_40_49_average,
+            self.fg_50_plus_average,
+        ]
+
+    @staticmethod
+    def all_stat_labels() -> typing.List[str]:
         return [
             "Field Goals Made",
             "Extra Points Made",
@@ -271,45 +353,18 @@ class KickerStats:
 
 
 @dataclasses.dataclass
-class PositionStats:
-    average_rank: float
-    best_rank: float
-    worst_rank: float
-    rank: float
-    standard_deviation: float
-    tier: float
-
-    @property
-    def all_stat_labels(self) -> typing.List[str]:
-        return [
-            "Position Average Rank",
-            "Position Best Rank",
-            "Position Worst Rank",
-            "Position Rank",
-            "Position Standard Deviation",
-            "Position Tier",
-        ]
-
-    @staticmethod
-    def from_csv_row(row: typing.Dict[str, typing.Any]) -> PositionStats:
-        return PositionStats(
-            average_rank=row["POS_AVG."],
-            best_rank=row["POS_BEST"],
-            worst_rank=row["POS_WORST"],
-            rank=row["POS_RK"],
-            standard_deviation=row["POS_STD.DEV"],
-            tier=row["POS_TIERS"],
-        )
-
-
-@dataclasses.dataclass
 class PPRStats:
+    boom: float
+    bust: float
+    starter: float
+    fantasy_points: float
+    average_fantasy_points: float
     average_rank: float
     best_rank: float
     worst_rank: float
     rank: float
-    tier: float
     standard_deviation: float
+    tier: float
     position_average_rank: float
     position_best_rank: float
     position_worst_rank: float
@@ -317,38 +372,95 @@ class PPRStats:
     position_tier: float
     position_std_dev: float
 
-    @property
-    def all_stat_labels(self) -> typing.List[str]:
+    def get_values_as_list(self) -> typing.List[typing.Any]:
         return [
-            "PPR Average Rank",
-            "PPR Best Rank",
-            "PPR Worst Rank",
-            "PPR Rank",
-            "PPR Tier",
-            "PPR Standard Deviation",
-            "PPR Position Average Rank",
-            "PPR Position Best Rank",
-            "PPR Position Worst Rank",
-            "PPR Position Rank",
-            "PPR Position Tier",
-            "PPR Position Standard Deviation",
+            self.boom,
+            self.bust,
+            self.starter,
+            self.fantasy_points,
+            self.average_fantasy_points,
+            self.average_rank,
+            self.best_rank,
+            self.worst_rank,
+            self.rank,
+            self.standard_deviation,
+            self.tier,
+            self.position_average_rank,
+            self.position_best_rank,
+            self.position_worst_rank,
+            self.position_rank,
+            self.position_tier,
+            self.position_std_dev,
+        ]
+
+    @staticmethod
+    def all_stat_labels() -> typing.List[str]:
+        return [
+            "Boom",
+            "Bust",
+            "Starter",
+            "Fantasy Points",
+            "Average Fantasy Points",
+            "Average Rank",
+            "Best Rank",
+            "Worst Rank",
+            "Rank",
+            "Standard Deviation",
+            "Tier",
+            "Position Average Rank",
+            "Position Best Rank",
+            "Position Worst Rank",
+            "Position Rank",
+            "Position Tier",
+            "Position Standard Deviation",
         ]
 
     @staticmethod
     def from_csv_row(row: typing.Dict[str, typing.Any]) -> PPRStats:
         return PPRStats(
+            boom=row["PPR_BOOM"],
+            bust=row["PPR_BUST"],
+            starter=row["PPR_STARTER"],
+            fantasy_points=row["PPR_FAN PTS"],
+            average_fantasy_points=row["PPR_AVG_FAN PTS"],
             average_rank=row["PPR_AVG_RK"],
             best_rank=row["PPR_BEST_RK"],
             worst_rank=row["PPR_WORST_RK"],
             rank=row["PPR_RK"],
-            tier=row["PPR_TIERS"],
             standard_deviation=row["PPR_STD.DEV_RK"],
+            tier=row["PPR_TIERS"],
             position_average_rank=row["PPR_POS_AVG."],
             position_best_rank=row["PPR_POS_BEST"],
             position_worst_rank=row["PPR_POS_WORST"],
             position_rank=row["PPR_POS_RK"],
             position_tier=row["PPR_POS_TIERS"],
             position_std_dev=row["PPR_POS_STD.DEV"],
+        )
+
+
+@dataclasses.dataclass
+class StandardStats(PPRStats):
+    @typing_extensions.override
+    @staticmethod
+    def from_csv_row(row: typing.Dict[str, typing.Any]) -> StandardStats:
+        return StandardStats(
+            boom=row["BOOM"],
+            bust=row["BUST"],
+            starter=row["STARTER"],
+            fantasy_points=row["FAN PTS"],
+            average_fantasy_points=row["AVG_FAN PTS"],
+            average_rank=row["AVG_RK"],
+            best_rank=row["BEST_RK"],
+            worst_rank=row["WORST_RK"],
+            rank=row["RK"],
+            standard_deviation=row["STD.DEV_RK"],
+            tier=row["TIERS"],
+            position_average_rank=row["POS_AVG."],
+            position_best_rank=row["POS_BEST"],
+            position_worst_rank=row["POS_WORST"],
+            position_rank=row["POS_RK"],
+            position_tier=row["POS_TIERS"],
+            position_std_dev=row["POS_STD.DEV"],
         )
 
 
@@ -360,21 +472,21 @@ class BasicInfo:
     season_sos: float
     full_sos: float
     playoff_sos: float
-    boom: float
-    bust: float
-    starter: float
-    fantasy_points: float
-    average_fantasy_points: float
     depth: int
-    average_rank: float
-    best_rank: float
-    worst_rank: float
-    rank: float
-    standard_deviation: float
-    tier: float
 
-    @property
-    def all_stat_labels(self) -> typing.List[str]:
+    def get_values_as_list(self) -> typing.List[typing.Any]:
+        return [
+            self.name,
+            self.position,
+            self.team,
+            self.season_sos,
+            self.full_sos,
+            self.playoff_sos,
+            self.depth,
+        ]
+
+    @staticmethod
+    def all_stat_labels() -> typing.List[str]:
         return [
             "Name",
             "Position",
@@ -382,18 +494,7 @@ class BasicInfo:
             "Season SOS",
             "Full SOS",
             "Playoff SOS",
-            "Boom",
-            "Bust",
-            "Starter",
-            "Fantasy Points",
-            "Average Fantasy Points",
             "Depth",
-            "Average Rank",
-            "Best Rank",
-            "Worst Rank",
-            "Rank",
-            "Standard Deviation",
-            "Tier",
         ]
 
     @staticmethod
@@ -405,18 +506,7 @@ class BasicInfo:
             season_sos=row["SEASON_SOS"],
             full_sos=row["FULL_SOS"],
             playoff_sos=row["PLAYOFF_SOS"],
-            boom=row["BOOM"],
-            bust=row["BUST"],
-            starter=row["STARTER"],
-            fantasy_points=row["FAN PTS"],
-            average_fantasy_points=row["AVG_FAN PTS"],
             depth=row["DEPTH"],
-            average_rank=row["AVG_RK"],
-            best_rank=row["BEST_RK"],
-            worst_rank=row["WORST_RK"],
-            rank=row["RK"],
-            standard_deviation=row["STD.DEV_RK"],
-            tier=row["TIERS"],
         )
 
 

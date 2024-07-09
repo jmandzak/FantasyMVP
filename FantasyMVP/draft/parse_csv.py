@@ -16,17 +16,26 @@ def read_player_stats(filename: str) -> Dict[str, Player]:
         player_stats[player.basic_info.name] = player
 
     players = _clean_players(player_stats)
-    return _sort_players(player_stats)
+    return _sort_players(players)
 
 
 # sort players by average rank
 def _sort_players(players: Dict[str, Player]) -> Dict[str, Player]:
-    return dict(sorted(players.items(), key=lambda x: x[1].basic_info.average_rank))
+    return dict(sorted(players.items(), key=lambda x: x[1].standard_stats.average_rank))
 
 
 def _clean_players(players: Dict[str, Player]) -> Dict[str, Player]:
     player_values = list(players.values())
     for player in player_values:
-        if np.isnan(player.basic_info.average_rank):
+        if _contains_nan(player):
             players.pop(player.basic_info.name)
     return players
+
+
+def _contains_nan(player: Player) -> bool:
+    return (
+        np.isnan(player.standard_stats.average_rank)
+        or np.isnan(player.ppr_stats.average_rank)
+        or np.isnan(player.standard_stats.fantasy_points)
+        or np.isnan(player.ppr_stats.fantasy_points)
+    )

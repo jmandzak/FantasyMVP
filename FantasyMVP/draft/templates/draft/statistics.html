@@ -12,25 +12,35 @@
 <body>
     <h1>Player Statistics</h1>
     
+    <div class="dropdown">
+        <button onclick="toggleDropdown()" class="dropbtn">Select Columns</button>
+        <div id="myDropdown" class="dropdown-content">
+            {% for header in headers %}
+                <label class="dropdown-item">
+                    <input type="checkbox" checked value="{{ column }}"> {{ header }}
+                </label>
+            {% endfor %}
+        </div>
+    </div>
+    
     {% if error_message %}
         <p>{{ error_message }}</p>
     {% else %}
         <table id="playersTable">
             <thead>
                 <tr>
-                    <th data-type="string">Name</th>
-                    <th data-type="string">Position</th>
-                    <th data-type="string">Team</th>
-                    <th data-type="number">Average Rank</th>
+                    {% for header in headers %}
+                        <th>{{ header }}</th>
+                    {% endfor %}
+                </tr>
                 </tr>
             </thead>
             <tbody>
                 {% for player in players %}
                     <tr>
-                        <td>{{ player.basic_info.name }}</td>
-                        <td>{{ player.basic_info.position }}</td>
-                        <td>{{ player.basic_info.team }}</td>
-                        <td>{{ player.basic_info.average_rank }}</td>
+                        {% for stat in player %}
+                            <td>{{ stat }}</td>
+                        {% endfor %}
                     </tr>
                 {% endfor %}
             </tbody>

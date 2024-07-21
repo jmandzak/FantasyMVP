@@ -17,7 +17,7 @@
         <div id="myDropdown" class="dropdown-content">
             {% for header in headers %}
                 <label class="dropdown-item">
-                    <input type="checkbox" checked value="{{ column }}"> {{ header }}
+                    <input type="checkbox" checked value="{{ column }}" onclick="selectColumn(event, {{ forloop.counter0 }})"> {{ header }} 
                 </label>
             {% endfor %}
         </div>

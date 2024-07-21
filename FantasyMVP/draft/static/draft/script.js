@@ -63,7 +63,8 @@ function toggleDropdown() {
 
 // Close the dropdown menu if the user clicks outside of it
 window.onclick = function(event) {
-    if (!event.target.matches('.dropbtn')) {
+    let isClickInsideDropdown = event.target.closest('.dropdown-content');
+    if (!event.target.matches('.dropbtn') && !isClickInsideDropdown) {
         var dropdowns = document.getElementsByClassName("dropdown-content");
         for (var i = 0; i < dropdowns.length; i++) {
             var openDropdown = dropdowns[i];
@@ -72,6 +73,11 @@ window.onclick = function(event) {
             }
         }
     }
+}
+
+// This function is called when a label inside the dropdown is clicked. Toggle the visibility of the column to match the checkbox
+function selectColumn(event, index) {
+    toggleColumn(index);
 }
 
 // Set column headers as sortable on document ready

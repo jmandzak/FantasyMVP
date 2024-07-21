@@ -18,7 +18,7 @@ def live_draft(request):
     return render(request, "draft/live_draft.html")
 
 
-def statistics(request):
+def all_statistics(request):
     players = read_player_stats(settings.CSV_FILE_PATH).values()
     row_values = [
         p.basic_info.get_values_as_list() + p.standard_stats.get_values_as_list()
@@ -28,6 +28,6 @@ def statistics(request):
 
     return render(
         request,
-        "draft/statistics.html",
+        "draft/all_statistics.html",
         {"players": row_values, "headers": row_headers},
     )

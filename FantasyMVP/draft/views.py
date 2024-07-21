@@ -29,7 +29,7 @@ def all_statistics(request: HttpRequest) -> HttpResponse:
 
     return render(
         request,
-        "draft/all_statistics.html",
+        "draft/statistics.html",
         {"players": row_values, "headers": row_headers},
     )
 
@@ -51,7 +51,7 @@ def qb_statistics(request: HttpRequest) -> HttpResponse:
 
     return render(
         request,
-        "draft/all_statistics.html",
+        "draft/statistics.html",
         {"players": row_values, "headers": row_headers},
     )
 
@@ -75,7 +75,7 @@ def rb_statistics(request: HttpRequest) -> HttpResponse:
 
     return render(
         request,
-        "draft/all_statistics.html",
+        "draft/statistics.html",
         {"players": row_values, "headers": row_headers},
     )
 
@@ -97,7 +97,7 @@ def wr_statistics(request: HttpRequest) -> HttpResponse:
 
     return render(
         request,
-        "draft/all_statistics.html",
+        "draft/statistics.html",
         {"players": row_values, "headers": row_headers},
     )
 
@@ -119,7 +119,7 @@ def te_statistics(request: HttpRequest) -> HttpResponse:
 
     return render(
         request,
-        "draft/all_statistics.html",
+        "draft/statistics.html",
         {"players": row_values, "headers": row_headers},
     )
 
@@ -141,7 +141,7 @@ def k_statistics(request: HttpRequest) -> HttpResponse:
 
     return render(
         request,
-        "draft/all_statistics.html",
+        "draft/statistics.html",
         {"players": row_values, "headers": row_headers},
     )
 
@@ -163,6 +163,6 @@ def def_statistics(request: HttpRequest) -> HttpResponse:
 
     return render(
         request,
-        "draft/all_statistics.html",
+        "draft/statistics.html",
         {"players": row_values, "headers": row_headers},
     )

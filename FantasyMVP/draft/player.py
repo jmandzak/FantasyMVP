@@ -3,8 +3,6 @@ from __future__ import annotations
 import dataclasses
 import typing
 
-import typing_extensions
-
 
 class Player:
     def __init__(self, csv_row: typing.Dict[str, typing.Any]) -> None:
@@ -440,7 +438,6 @@ class PPRStats:
 
 @dataclasses.dataclass
 class StandardStats(PPRStats):
-    @typing_extensions.override
     @staticmethod
     def from_csv_row(row: typing.Dict[str, typing.Any]) -> StandardStats:
         return StandardStats(

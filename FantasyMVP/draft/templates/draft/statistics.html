@@ -33,6 +33,11 @@
     <button type="button" onclick="location.href='/te-statistics'">TE</button>
     <button type="button" onclick="location.href='/k-statistics'">K</button>
     <button type="button" onclick="location.href='/def-statistics'">DEF</button>
+
+    <br>
+    <br>
+
+    <button type="button" onclick="downloadTable()">Download</button>
     
     {% if error_message %}
         <p>{{ error_message }}</p>

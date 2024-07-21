@@ -1,13 +1,13 @@
 function sortTable(columnIndex, dataType) {
-    var table = document.getElementById("playersTable");
-    var rows = table.rows;
-    var players = [];
+    let table = document.getElementById("playersTable");
+    let rows = table.rows;
+    let players = [];
 
     // Gather all player rows into an array
-    for (var i = 1; i < rows.length; i++) {
-        var player = [];
-        var cells = rows[i].getElementsByTagName("td");
-        for (var j = 0; j < cells.length; j++) {
+    for (let i = 1; i < rows.length; i++) {
+        let player = [];
+        let cells = rows[i].getElementsByTagName("td");
+        for (let j = 0; j < cells.length; j++) {
             player.push(cells[j].innerHTML.trim());
         }
         players.push(player);
@@ -24,7 +24,7 @@ function sortTable(columnIndex, dataType) {
     });
 
     // See if the column has already been sorted by using the data-sorted attribute
-    var sorted = table.rows[0].getElementsByTagName("th")[columnIndex].getAttribute("data-sorted");
+    let sorted = table.rows[0].getElementsByTagName("th")[columnIndex].getAttribute("data-sorted");
     if (sorted === "ascending") {
         // Reverse the array if it was already sorted in ascending order
         players.reverse();
@@ -36,9 +36,9 @@ function sortTable(columnIndex, dataType) {
     }
 
     // Re-render the table with sorted data by simply replacing the value of each cell in the table
-    for (var i = 0; i < players.length; i++) {
-        var cells = rows[i + 1].getElementsByTagName("td");
-        for (var j = 0; j < cells.length; j++) {
+    for (let i = 0; i < players.length; i++) {
+        let cells = rows[i + 1].getElementsByTagName("td");
+        for (let j = 0; j < cells.length; j++) {
             cells[j].innerHTML = players[i][j];
         }
     }
@@ -46,12 +46,12 @@ function sortTable(columnIndex, dataType) {
 
 function toggleColumn(columnIndex) {
     // Toggle class for header
-    var header = document.querySelector(`#playersTable th:nth-child(${columnIndex + 1})`);
+    let header = document.querySelector(`#playersTable th:nth-child(${columnIndex + 1})`);
     if (header) {
         header.classList.toggle('hidden-column');
     }
     // Toggle class for each cell in the column
-    var rows = document.querySelectorAll(`#playersTable td:nth-child(${columnIndex + 1})`);
+    let rows = document.querySelectorAll(`#playersTable td:nth-child(${columnIndex + 1})`);
     rows.forEach(function(cell) {
         cell.classList.toggle('hidden-column');
     });
@@ -65,9 +65,9 @@ function toggleDropdown() {
 window.onclick = function(event) {
     let isClickInsideDropdown = event.target.closest('.dropdown-content');
     if (!event.target.matches('.dropbtn') && !isClickInsideDropdown) {
-        var dropdowns = document.getElementsByClassName("dropdown-content");
-        for (var i = 0; i < dropdowns.length; i++) {
-            var openDropdown = dropdowns[i];
+        let dropdowns = document.getElementsByClassName("dropdown-content");
+        for (let i = 0; i < dropdowns.length; i++) {
+            let openDropdown = dropdowns[i];
             if (openDropdown.classList.contains('show')) {
                 openDropdown.classList.remove('show');
             }
@@ -80,14 +80,62 @@ function selectColumn(event, index) {
     toggleColumn(index);
 }
 
+function downloadTable() {
+    // download the visible aspects of the table as a CSV file on the user computer with the name {position}_statistics.csv
+    let table = document.getElementById("playersTable");
+    let rows = table.rows;
+    let csv = "";
+    for (let i = 0; i < rows.length; i++) {
+        // Get all th or td elements in the row
+        if((rows[i].getElementsByTagName("th")).length > 0) {
+            var cells = rows[i].getElementsByTagName("th");
+        }
+        else {
+            var cells = rows[i].getElementsByTagName("td");
+        }
+        for (let j = 0; j < cells.length; j++) {
+            if (cells[j].classList.contains("hidden-column")) {
+                continue;
+            }
+            csv += cells[j].innerHTML.trim();
+            if (j < cells.length - 1) {
+                csv += ",";
+            }
+        }
+        csv += "\n";
+    }
+
+    let url = document.URL.toString();
+    console.log(url)
+    url = url.split("/");
+    url.pop();
+    let filename = url.pop() + ".csv";
+    let blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    if (navigator.msSaveBlob) { // IE 10+
+        navigator.msSaveBlob(blob, filename);
+    }
+    else {
+        let link = document.createElement("a");
+        if (link.download !== undefined) {
+            let url = URL.createObjectURL(blob);
+            link.setAttribute("href", url);
+            link.setAttribute("download", filename);
+            link.style.visibility = "hidden";
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+    }
+}
+
 // Set column headers as sortable on document ready
 document.addEventListener("DOMContentLoaded", function() {
-    var headers = document.querySelectorAll("#playersTable th");
+    let headers = document.querySelectorAll("#playersTable th");
     headers.forEach(function(header, index) {
         header.addEventListener("click", function() {
             // Look at the first row to determine the data type of the column
-            var dataType = "string";
-            var cells = document.querySelectorAll("#playersTable tr:nth-child(2) td");
+            let dataType = "string";
+            let cells = document.querySelectorAll("#playersTable tr:nth-child(2) td");
             if (!isNaN(cells[index].innerHTML)) {
                 dataType = "number";
             }

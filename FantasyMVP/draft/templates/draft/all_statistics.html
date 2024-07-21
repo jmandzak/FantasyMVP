@@ -22,6 +22,17 @@
             {% endfor %}
         </div>
     </div>
+
+    <br>
+    <br>
+
+    <button type="button" onclick="location.href='/all-statistics'">All</button>
+    <button type="button" onclick="location.href='/qb-statistics'">QB</button>
+    <button type="button" onclick="location.href='/rb-statistics'">RB</button>
+    <button type="button" onclick="location.href='/wr-statistics'">WR</button>
+    <button type="button" onclick="location.href='/te-statistics'">TE</button>
+    <button type="button" onclick="location.href='/k-statistics'">K</button>
+    <button type="button" onclick="location.href='/def-statistics'">DEF</button>
     
     {% if error_message %}
         <p>{{ error_message }}</p>

@@ -331,7 +331,7 @@ class KickerStats:
             average_fgm = 0
         else:
             games = xpa / average_xpa
-            average_fgm = fgm / games
+            average_fgm = round(fgm / games, 2)
         return KickerStats(
             field_goals_made=fgm,
             extra_points_made=xpm,

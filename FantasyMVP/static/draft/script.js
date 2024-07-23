@@ -128,6 +128,49 @@ function downloadTable() {
     }
 }
 
+function getPPRVersion() {
+    // Get the current URL and add the query parameter to it
+    let url = document.URL.toString();
+    // Check and see if QB, DEF, or K is in the URL
+    let position = "";
+    if (url.includes("ppr")) {
+        return;
+    }
+    else {
+        // Prepend the last part of the url with PPR
+        url = url.split("/");
+        url.pop();
+        position = url.pop();
+        new_position = "ppr-" + position;
+    }
+    // Redirect to the PPR version of the page
+    window.location.pathname = new_position;
+}
+
+function getStandardVersion() {
+    // Get the current URL and add the query parameter to it
+    let url = document.URL.toString();
+    if (!url.includes("ppr")) {
+        return;
+    }
+    else {
+        // Remove PPR from the URL
+        url = url.replace("ppr-", "");
+    }
+    // Redirect to the standard version of the page
+    window.location.href = url;
+}
+
+function changePosition(position) {
+    let has_ppr = false;
+    let url = document.URL.toString();
+    if (url.includes("ppr")) {
+        has_ppr = true;
+    }
+    // Redirect to the new position
+    window.location.pathname = (has_ppr ? "ppr-" : "") + position + "-statistics/";
+}
+
 // Set column headers as sortable on document ready
 document.addEventListener("DOMContentLoaded", function() {
     let headers = document.querySelectorAll("#playersTable th");

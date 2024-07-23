@@ -26,17 +26,19 @@
     <br>
     <br>
 
-    <button type="button" onclick="location.href='/all-statistics'">All</button>
-    <button type="button" onclick="location.href='/qb-statistics'">QB</button>
-    <button type="button" onclick="location.href='/rb-statistics'">RB</button>
-    <button type="button" onclick="location.href='/wr-statistics'">WR</button>
-    <button type="button" onclick="location.href='/te-statistics'">TE</button>
-    <button type="button" onclick="location.href='/k-statistics'">K</button>
-    <button type="button" onclick="location.href='/def-statistics'">DEF</button>
+    <button type="button" onclick="changePosition('all')">All</button>
+    <button type="button" onclick="changePosition('qb')">QB</button>
+    <button type="button" onclick="changePosition('rb')">RB</button>
+    <button type="button" onclick="changePosition('wr')">WR</button>
+    <button type="button" onclick="changePosition('te')">TE</button>
+    <button type="button" onclick="changePosition('k')">K</button>
+    <button type="button" onclick="changePosition('def')">DEF</button>
 
     <br>
     <br>
 
+    <button type="button" onclick="getPPRVersion()">PPR</button>
+    <button type="button" onclick="getStandardVersion()">Standard</button>
     <button type="button" onclick="downloadTable()">Download</button>
     
     {% if error_message %}

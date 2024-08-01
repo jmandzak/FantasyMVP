@@ -16,6 +16,65 @@ class Player:
         self.receiver_stats = ReceivingStats.from_csv_row(csv_row)
         self.defense_stats = DefenseStats.from_csv_row(csv_row)
         self.kicker_stats = KickerStats.from_csv_row(csv_row)
+        self.redzone_stats = RedzoneStats.from_csv_row(csv_row)
+
+
+@dataclasses.dataclass
+class RedzoneStats:
+    rush_attempts_20: int
+    rush_attempts_10: int
+    rush_attempts_5: int
+    rush_percent_20: float
+    rush_percent_10: float
+    rush_percent_5: float
+    targets_20: int
+    targets_10: int
+    targets_percent_20: float
+    targets_percent_10: float
+
+    def get_values_as_list(self) -> typing.List[typing.Any]:
+        return [
+            self.rush_attempts_20,
+            self.rush_attempts_10,
+            self.rush_attempts_5,
+            self.rush_percent_20,
+            self.rush_percent_10,
+            self.rush_percent_5,
+            self.targets_20,
+            self.targets_10,
+            self.targets_percent_20,
+            self.targets_percent_10,
+        ]
+
+    @staticmethod
+    def all_stat_labels() -> typing.List[str]:
+        return [
+            "Rush Attempts from 20",
+            "Rush Attempts from 10",
+            "Rush Attempts from 5",
+            "Rush Percent from 20",
+            "Rush Percent from 10",
+            "Rush Percent from 5",
+            "Targets from 20",
+            "Targets from 10",
+            "Targets Percent from 20",
+            "Targets Percent from 10",
+        ]
+
+    @staticmethod
+    def from_csv_row(row: typing.Dict[str, typing.Any]) -> RedzoneStats:
+        return RedzoneStats(
+            rush_attempts_20=row["20_YD_ATT"],
+            rush_attempts_10=row["10_YD_ATT"],
+            rush_attempts_5=row["5_YD_ATT"],
+            rush_percent_20=row["20_YD_%RUSH"],
+            rush_percent_10=row["10_YD_%RUSH"],
+            rush_percent_5=row["5_YD_%RUSH"],
+            targets_20=row["20_YD_TGT"],
+            targets_10=row["10_YD_TGT"],
+            targets_percent_20=row["20_YD_%TGT"],
+            targets_percent_10=row["10_YD_%TGT"],
+        )
 
 
 @dataclasses.dataclass
@@ -369,6 +428,7 @@ class PPRStats:
     position_rank: float
     position_tier: float
     position_std_dev: float
+    adp: float
 
     def get_values_as_list(self) -> typing.List[typing.Any]:
         return [
@@ -389,6 +449,7 @@ class PPRStats:
             self.position_rank,
             self.position_tier,
             self.position_std_dev,
+            self.adp,
         ]
 
     @staticmethod
@@ -411,6 +472,7 @@ class PPRStats:
             "Position Rank",
             "Position Tier",
             "Position Standard Deviation",
+            "ADP",
         ]
 
     @staticmethod
@@ -433,6 +495,7 @@ class PPRStats:
             position_rank=row["PPR_POS_RK"],
             position_tier=row["PPR_POS_TIERS"],
             position_std_dev=row["PPR_POS_STD.DEV"],
+            adp=row["PPR_ADP"],
         )
 
 
@@ -458,6 +521,7 @@ class StandardStats(PPRStats):
             position_rank=row["POS_RK"],
             position_tier=row["POS_TIERS"],
             position_std_dev=row["POS_STD.DEV"],
+            adp=row["STANDARD_ADP"],
         )
 
 

@@ -56,12 +56,14 @@ def qb_statistics(request: HttpRequest) -> HttpResponse:
         p.basic_info.get_values_as_list()
         + p.ppr_stats.get_values_as_list()
         + p.quarterback_stats.get_values_as_list()
+        + p.redzone_stats.get_values_as_list()
         for p in players
     ]
     row_headers = (
         BasicInfo.all_stat_labels()
         + PPRStats.all_stat_labels()
         + PassingStats.all_stat_labels()
+        + RedzoneStats.all_stat_labels()
     )
 
     return render(
@@ -79,6 +81,7 @@ def rb_statistics(request: HttpRequest) -> HttpResponse:
         + p.standard_stats.get_values_as_list()
         + p.runningback_stats.get_values_as_list()
         + p.receiver_stats.get_values_as_list()
+        + p.redzone_stats.get_values_as_list()
         for p in players
     ]
     row_headers = (
@@ -86,6 +89,7 @@ def rb_statistics(request: HttpRequest) -> HttpResponse:
         + StandardStats.all_stat_labels()
         + RushingStats.all_stat_labels()
         + ReceivingStats.all_stat_labels()
+        + RedzoneStats.all_stat_labels()
     )
 
     return render(
@@ -103,6 +107,7 @@ def rb_ppr_statistics(request: HttpRequest) -> HttpResponse:
         + p.ppr_stats.get_values_as_list()
         + p.runningback_stats.get_values_as_list()
         + p.receiver_stats.get_values_as_list()
+        + p.redzone_stats.get_values_as_list()
         for p in players
     ]
     row_headers = (
@@ -110,6 +115,7 @@ def rb_ppr_statistics(request: HttpRequest) -> HttpResponse:
         + PPRStats.all_stat_labels()
         + RushingStats.all_stat_labels()
         + ReceivingStats.all_stat_labels()
+        + RedzoneStats.all_stat_labels()
     )
 
     return render(
@@ -126,12 +132,14 @@ def wr_statistics(request: HttpRequest) -> HttpResponse:
         p.basic_info.get_values_as_list()
         + p.standard_stats.get_values_as_list()
         + p.receiver_stats.get_values_as_list()
+        + p.redzone_stats.get_values_as_list()
         for p in players
     ]
     row_headers = (
         BasicInfo.all_stat_labels()
         + StandardStats.all_stat_labels()
         + ReceivingStats.all_stat_labels()
+        + RedzoneStats.all_stat_labels()
     )
 
     return render(
@@ -148,12 +156,14 @@ def wr_ppr_statistics(request: HttpRequest) -> HttpResponse:
         p.basic_info.get_values_as_list()
         + p.ppr_stats.get_values_as_list()
         + p.receiver_stats.get_values_as_list()
+        + p.redzone_stats.get_values_as_list()
         for p in players
     ]
     row_headers = (
         BasicInfo.all_stat_labels()
         + PPRStats.all_stat_labels()
         + ReceivingStats.all_stat_labels()
+        + RedzoneStats.all_stat_labels()
     )
 
     return render(
@@ -170,12 +180,14 @@ def te_statistics(request: HttpRequest) -> HttpResponse:
         p.basic_info.get_values_as_list()
         + p.standard_stats.get_values_as_list()
         + p.receiver_stats.get_values_as_list()
+        + p.redzone_stats.get_values_as_list()
         for p in players
     ]
     row_headers = (
         BasicInfo.all_stat_labels()
         + StandardStats.all_stat_labels()
         + ReceivingStats.all_stat_labels()
+        + RedzoneStats.all_stat_labels()
     )
 
     return render(
@@ -192,12 +204,14 @@ def te_ppr_statistics(request: HttpRequest) -> HttpResponse:
         p.basic_info.get_values_as_list()
         + p.ppr_stats.get_values_as_list()
         + p.receiver_stats.get_values_as_list()
+        + p.redzone_stats.get_values_as_list()
         for p in players
     ]
     row_headers = (
         BasicInfo.all_stat_labels()
         + PPRStats.all_stat_labels()
         + ReceivingStats.all_stat_labels()
+        + RedzoneStats.all_stat_labels()
     )
 
     return render(

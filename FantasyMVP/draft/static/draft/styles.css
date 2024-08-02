@@ -1,26 +1,32 @@
 /* styles.css */
 
-/* Table styling */
-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 20px;
+table thead tr th {
+/* you could also change td instead th depending your html code */
+    background-color: lightgreen;
+    position: sticky;
+    z-index: 2;
+    top: 0;
+    padding: 8px;
 }
 
-th, td {
+table tbody th {
+    background-color: lightcyan;
+    position: sticky;
+    z-index: 1;
+    top: 0;
+    padding: 8px;
+    left: 0;
+}
+
+table td {
     padding: 8px;
     text-align: left;
     border-bottom: 1px solid #ddd;
+    z-index: 0;
 }
-
-th {
-    background-color: #f2f2f2;
-    cursor: pointer;
-}
-
-/* Hover effect on table rows */
-tr:hover {
-    background-color: #f5f5f5;
+  
+tr:nth-child(even) {
+background-color: lightgray;
 }
 
 .hidden-column {

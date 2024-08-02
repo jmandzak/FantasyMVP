@@ -57,7 +57,11 @@
                 {% for player in players %}
                     <tr>
                         {% for stat in player %}
-                            <td>{{ stat }}</td>
+                            {% if forloop.first %}
+                                <th>{{ stat }}</th>
+                            {% else %}
+                                <td>{{ stat }}</td>
+                            {% endif %}
                         {% endfor %}
                     </tr>
                 {% endfor %}

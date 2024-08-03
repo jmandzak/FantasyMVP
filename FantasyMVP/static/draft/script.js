@@ -6,7 +6,18 @@ function sortTable(columnIndex, dataType) {
     // Gather all player rows into an array
     for (let i = 1; i < rows.length; i++) {
         let player = [];
-        let cells = rows[i].getElementsByTagName("td");
+        let th_cells = rows[i].getElementsByTagName("th");
+        let td_cells = rows[i].getElementsByTagName("td");
+        if(td_cells.length < 0) {
+            continue;
+        }
+        let cells = Array()
+        for(let j = 0; j < th_cells.length; j++) {
+            cells.push(th_cells[j]);
+        }
+        for(let j = 0; j < td_cells.length; j++) {
+            cells.push(td_cells[j]);
+        }
         for (let j = 0; j < cells.length; j++) {
             player.push(cells[j].innerHTML.trim());
         }
@@ -37,7 +48,15 @@ function sortTable(columnIndex, dataType) {
 
     // Re-render the table with sorted data by simply replacing the value of each cell in the table
     for (let i = 0; i < players.length; i++) {
-        let cells = rows[i + 1].getElementsByTagName("td");
+        let th_cells = rows[i + 1].getElementsByTagName("th");
+        let td_cells = rows[i + 1].getElementsByTagName("td");
+        let cells = Array()
+        for(let j = 0; j < th_cells.length; j++) {
+            cells.push(th_cells[j]);
+        }
+        for(let j = 0; j < td_cells.length; j++) {
+            cells.push(td_cells[j]);
+        }
         for (let j = 0; j < cells.length; j++) {
             cells[j].innerHTML = players[i][j];
         }
@@ -106,7 +125,6 @@ function downloadTable() {
     }
 
     let url = document.URL.toString();
-    console.log(url)
     url = url.split("/");
     url.pop();
     let filename = url.pop() + ".csv";
@@ -173,7 +191,7 @@ function changePosition(position) {
 
 // Set column headers as sortable on document ready
 document.addEventListener("DOMContentLoaded", function() {
-    let headers = document.querySelectorAll("#playersTable th");
+    let headers = document.querySelectorAll("#playersTable tr:first-child th");
     headers.forEach(function(header, index) {
         header.addEventListener("click", function() {
             // Look at the first row to determine the data type of the column

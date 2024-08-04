@@ -190,6 +190,12 @@ function changePosition(position) {
 }
 
 function highlightRow(row) {
+    // Check if row is already highlighted
+    if (row.classList.contains('highlight')) {
+        row.classList.remove('highlight');
+        return;
+    }
+    
     // Remove highlight from all rows
     var rows = document.querySelectorAll('tr');
     rows.forEach(function(r) {

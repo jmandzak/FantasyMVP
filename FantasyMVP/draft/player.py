@@ -1,11 +1,15 @@
 from __future__ import annotations
 
 import dataclasses
+import math
 import typing
+
+import numpy as np
 
 
 class Player:
     def __init__(self, csv_row: typing.Dict[str, typing.Any]) -> None:
+        csv_row = _clean_dict(csv_row)
         self.basic_info = BasicInfo.from_csv_row(csv_row)
         self.standard_stats = StandardStats.from_csv_row(csv_row)
         self.ppr_stats = PPRStats.from_csv_row(csv_row)
@@ -560,7 +564,7 @@ class BasicInfo:
 
     @staticmethod
     def from_csv_row(row: typing.Dict[str, typing.Any]) -> BasicInfo:
-        return BasicInfo(
+        info = BasicInfo(
             name=_clean_name(row["PLAYER NAME"]),
             position=row["POS"],
             team=row["TEAM"],
@@ -569,8 +573,22 @@ class BasicInfo:
             playoff_sos=row["PLAYOFF_SOS"],
             depth=row["DEPTH"],
         )
+        if info.depth == 0:
+            info.depth = 10
+        return info
 
 
 def _clean_name(name: str) -> str:
     # Currently names are all CAPS, so just make them title case where dashes count as spaces when doing the titling
     return name.title()
+
+
+def _clean_dict(row: typing.Dict[str, typing.Any]) -> typing.Dict[str, typing.Any]:
+    COLS_TO_SET_TO_500 = ["RK", "TIER", "STD.DEV"]
+    for k, v in row.items():
+        if isinstance(v, float) and math.isnan(v):
+            if np.any([col in k for col in COLS_TO_SET_TO_500]):
+                row[k] = 500
+            else:
+                row[k] = 0
+    return row

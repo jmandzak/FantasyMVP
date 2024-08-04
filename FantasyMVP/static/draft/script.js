@@ -189,6 +189,17 @@ function changePosition(position) {
     window.location.pathname = (has_ppr ? "ppr-" : "") + position + "-statistics/";
 }
 
+function highlightRow(row) {
+    // Remove highlight from all rows
+    var rows = document.querySelectorAll('tr');
+    rows.forEach(function(r) {
+        r.classList.remove('highlight');
+    });
+
+    // Add highlight to the clicked row
+    row.classList.add('highlight');
+}
+
 // Set column headers as sortable on document ready
 document.addEventListener("DOMContentLoaded", function() {
     let headers = document.querySelectorAll("#playersTable tr:first-child th");

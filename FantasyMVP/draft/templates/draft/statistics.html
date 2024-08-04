@@ -55,7 +55,7 @@
             </thead>
             <tbody>
                 {% for player in players %}
-                    <tr>
+                    <tr onclick="highlightRow(this)">
                         {% for stat in player %}
                             <td>{{ stat }}</td>
                         {% endfor %}

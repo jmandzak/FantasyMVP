@@ -75,3 +75,14 @@ background-color: lightgray;
 
 /* Show the dropdown menu (use JS to add this class to the .dropdown-content container when the user clicks on the dropdown button) */
 .show {display: block;}
+
+tr.highlight {
+    background-color: yellow !important;
+}
+
+tr.highlight td:first-child {
+    background-color: yellow !important;
+    z-index: 3; /* Ensure it is above other elements */
+    position: sticky; /* Maintain sticky position */
+    left: 0; /* Ensure it stays in place */
+}

@@ -9,7 +9,7 @@ table thead tr th {
     padding: 8px;
 }
 
-table tbody th {
+table tbody td:first-child {
     background-color: lightcyan;
     position: sticky;
     z-index: 1;

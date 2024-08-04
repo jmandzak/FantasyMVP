@@ -57,14 +57,8 @@
                 {% for player in players %}
                     <tr>
                         {% for stat in player %}
-                            {% if forloop.first %}
-                                <th>{{ stat }}</th>
-                            {% else %}
-                                <td>{{ stat }}</td>
-                            {% endif %}
+                            <td>{{ stat }}</td>
                         {% endfor %}
-                        {% comment %} add an extra column that is hidden {% endcomment %}
-                        <td style="display: none;">{{ player.0 }}</td>
                     </tr>
                 {% endfor %}
             </tbody>

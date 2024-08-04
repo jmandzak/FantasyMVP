@@ -26,7 +26,6 @@ function sortTable(columnIndex, dataType) {
     
     // Sort the array based on the data type of the column
     players.sort(function(a, b) {
-        console.log(dataType)
         if (dataType === "number") {
             return a[columnIndex] - b[columnIndex];
         }
@@ -198,8 +197,6 @@ document.addEventListener("DOMContentLoaded", function() {
             // Look at the first row to determine the data type of the column
             let dataType = "string";
             let cells = document.querySelectorAll("#playersTable tr:nth-child(2) td");
-            console.log(cells[index].innerHTML)
-            console.log(index)
             if (!isNaN(cells[index].innerHTML)) {
                 dataType = "number";
             }

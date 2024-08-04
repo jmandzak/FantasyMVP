@@ -3,7 +3,7 @@ from django.conf import settings
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import render
 
-from .parse_csv import read_player_stats
+from .parse_csv import read_player_stats, sort_players
 from .player import *
 
 
@@ -20,7 +20,8 @@ def live_draft(request: HttpRequest) -> HttpResponse:
 
 
 def all_statistics(request: HttpRequest) -> HttpResponse:
-    players = read_player_stats(settings.CSV_FILE_PATH).values()
+    players = read_player_stats(settings.CSV_FILE_PATH)
+    players = sort_players(players, False).values()
     row_values = [
         p.basic_info.get_values_as_list() + p.standard_stats.get_values_as_list()
         for p in players
@@ -35,7 +36,8 @@ def all_statistics(request: HttpRequest) -> HttpResponse:
 
 
 def all_ppr_statistics(request: HttpRequest) -> HttpResponse:
-    players = read_player_stats(settings.CSV_FILE_PATH).values()
+    players = read_player_stats(settings.CSV_FILE_PATH)
+    players = sort_players(players, True).values()
     row_values = [
         p.basic_info.get_values_as_list() + p.ppr_stats.get_values_as_list()
         for p in players
@@ -50,7 +52,8 @@ def all_ppr_statistics(request: HttpRequest) -> HttpResponse:
 
 
 def qb_statistics(request: HttpRequest) -> HttpResponse:
-    players = read_player_stats(settings.CSV_FILE_PATH).values()
+    players = read_player_stats(settings.CSV_FILE_PATH)
+    players = sort_players(players, False).values()
     players = [p for p in players if p.basic_info.position == "QB"]
     row_values = [
         p.basic_info.get_values_as_list()
@@ -74,7 +77,8 @@ def qb_statistics(request: HttpRequest) -> HttpResponse:
 
 
 def rb_statistics(request: HttpRequest) -> HttpResponse:
-    players = read_player_stats(settings.CSV_FILE_PATH).values()
+    players = read_player_stats(settings.CSV_FILE_PATH)
+    players = sort_players(players, False).values()
     players = [p for p in players if p.basic_info.position == "RB"]
     row_values = [
         p.basic_info.get_values_as_list()
@@ -100,7 +104,8 @@ def rb_statistics(request: HttpRequest) -> HttpResponse:
 
 
 def rb_ppr_statistics(request: HttpRequest) -> HttpResponse:
-    players = read_player_stats(settings.CSV_FILE_PATH).values()
+    players = read_player_stats(settings.CSV_FILE_PATH)
+    players = sort_players(players, True).values()
     players = [p for p in players if p.basic_info.position == "RB"]
     row_values = [
         p.basic_info.get_values_as_list()
@@ -126,7 +131,8 @@ def rb_ppr_statistics(request: HttpRequest) -> HttpResponse:
 
 
 def wr_statistics(request: HttpRequest) -> HttpResponse:
-    players = read_player_stats(settings.CSV_FILE_PATH).values()
+    players = read_player_stats(settings.CSV_FILE_PATH)
+    players = sort_players(players, False).values()
     players = [p for p in players if p.basic_info.position == "WR"]
     row_values = [
         p.basic_info.get_values_as_list()
@@ -150,7 +156,8 @@ def wr_statistics(request: HttpRequest) -> HttpResponse:
 
 
 def wr_ppr_statistics(request: HttpRequest) -> HttpResponse:
-    players = read_player_stats(settings.CSV_FILE_PATH).values()
+    players = read_player_stats(settings.CSV_FILE_PATH)
+    players = sort_players(players, True).values()
     players = [p for p in players if p.basic_info.position == "WR"]
     row_values = [
         p.basic_info.get_values_as_list()
@@ -174,7 +181,8 @@ def wr_ppr_statistics(request: HttpRequest) -> HttpResponse:
 
 
 def te_statistics(request: HttpRequest) -> HttpResponse:
-    players = read_player_stats(settings.CSV_FILE_PATH).values()
+    players = read_player_stats(settings.CSV_FILE_PATH)
+    players = sort_players(players, False).values()
     players = [p for p in players if p.basic_info.position == "TE"]
     row_values = [
         p.basic_info.get_values_as_list()
@@ -198,7 +206,8 @@ def te_statistics(request: HttpRequest) -> HttpResponse:
 
 
 def te_ppr_statistics(request: HttpRequest) -> HttpResponse:
-    players = read_player_stats(settings.CSV_FILE_PATH).values()
+    players = read_player_stats(settings.CSV_FILE_PATH)
+    players = sort_players(players, True).values()
     players = [p for p in players if p.basic_info.position == "TE"]
     row_values = [
         p.basic_info.get_values_as_list()
@@ -222,7 +231,8 @@ def te_ppr_statistics(request: HttpRequest) -> HttpResponse:
 
 
 def k_statistics(request: HttpRequest) -> HttpResponse:
-    players = read_player_stats(settings.CSV_FILE_PATH).values()
+    players = read_player_stats(settings.CSV_FILE_PATH)
+    players = sort_players(players, False).values()
     players = [p for p in players if p.basic_info.position == "K"]
     row_values = [
         p.basic_info.get_values_as_list()
@@ -244,7 +254,8 @@ def k_statistics(request: HttpRequest) -> HttpResponse:
 
 
 def def_statistics(request: HttpRequest) -> HttpResponse:
-    players = read_player_stats(settings.CSV_FILE_PATH).values()
+    players = read_player_stats(settings.CSV_FILE_PATH)
+    players = sort_players(players, False).values()
     players = [p for p in players if p.basic_info.position == "DEF"]
     row_values = [
         p.basic_info.get_values_as_list()

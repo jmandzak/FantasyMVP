@@ -16,12 +16,13 @@ def read_player_stats(filename: str) -> Dict[str, Player]:
         player_stats[player.basic_info.name] = player
 
     players = _clean_players(player_stats)
-    return _sort_players(players)
+    return players
 
 
-# sort players by average rank
-def _sort_players(players: Dict[str, Player]) -> Dict[str, Player]:
-    return dict(sorted(players.items(), key=lambda x: x[1].standard_stats.average_rank))
+def sort_players(players: Dict[str, Player], ppr: bool) -> Dict[str, Player]:
+    if ppr:
+        return dict(sorted(players.items(), key=lambda x: x[1].ppr_stats.adp))
+    return dict(sorted(players.items(), key=lambda x: x[1].standard_stats.adp))
 
 
 def _clean_players(players: Dict[str, Player]) -> Dict[str, Player]:

@@ -20,65 +20,48 @@ class Player:
         self.receiver_stats = ReceivingStats.from_csv_row(csv_row)
         self.defense_stats = DefenseStats.from_csv_row(csv_row)
         self.kicker_stats = KickerStats.from_csv_row(csv_row)
-        self.redzone_stats = RedzoneStats.from_csv_row(csv_row)
 
+    def scoring_based_stats(self, ppr: bool) -> typing.List[typing.Any]:
+        if ppr:
+            return self.ppr_stats.get_values_as_list()
+        return self.standard_stats.get_values_as_list()
 
-@dataclasses.dataclass
-class RedzoneStats:
-    rush_attempts_20: int
-    rush_attempts_10: int
-    rush_attempts_5: int
-    rush_percent_20: float
-    rush_percent_10: float
-    rush_percent_5: float
-    targets_20: int
-    targets_10: int
-    targets_percent_20: float
-    targets_percent_10: float
+    def position_based_stats(self) -> typing.List[typing.Any]:
+        if self.basic_info.position == "QB":
+            return (
+                self.quarterback_stats.get_values_as_list()
+                + self.runningback_stats.get_values_as_list()
+            )
+        if self.basic_info.position == "RB":
+            return (
+                self.runningback_stats.get_values_as_list()
+                + self.receiver_stats.get_values_as_list()
+            )
+        if self.basic_info.position in ["WR", "TE"]:
+            return self.receiver_stats.get_values_as_list()
+        if self.basic_info.position == "DEF":
+            return self.defense_stats.get_values_as_list()
+        if self.basic_info.position == "K":
+            return self.kicker_stats.get_values_as_list()
+        assert False, f"Unknown position: {self.basic_info.position}"
 
-    def get_values_as_list(self) -> typing.List[typing.Any]:
-        return [
-            self.rush_attempts_20,
-            self.rush_attempts_10,
-            self.rush_attempts_5,
-            self.rush_percent_20,
-            self.rush_percent_10,
-            self.rush_percent_5,
-            self.targets_20,
-            self.targets_10,
-            self.targets_percent_20,
-            self.targets_percent_10,
-        ]
+    def scoring_based_labels(self, ppr: bool) -> typing.List[str]:
+        if ppr:
+            return PPRStats.all_stat_labels()
+        return StandardStats.all_stat_labels()
 
-    @staticmethod
-    def all_stat_labels() -> typing.List[str]:
-        return [
-            "Rush Attempts from 20",
-            "Rush Attempts from 10",
-            "Rush Attempts from 5",
-            "Rush Percent from 20",
-            "Rush Percent from 10",
-            "Rush Percent from 5",
-            "Targets from 20",
-            "Targets from 10",
-            "Targets Percent from 20",
-            "Targets Percent from 10",
-        ]
-
-    @staticmethod
-    def from_csv_row(row: typing.Dict[str, typing.Any]) -> RedzoneStats:
-        return RedzoneStats(
-            rush_attempts_20=row["20_YD_ATT"],
-            rush_attempts_10=row["10_YD_ATT"],
-            rush_attempts_5=row["5_YD_ATT"],
-            rush_percent_20=row["20_YD_%RUSH"],
-            rush_percent_10=row["10_YD_%RUSH"],
-            rush_percent_5=row["5_YD_%RUSH"],
-            targets_20=row["20_YD_TGT"],
-            targets_10=row["10_YD_TGT"],
-            targets_percent_20=row["20_YD_%TGT"],
-            targets_percent_10=row["10_YD_%TGT"],
-        )
+    def position_based_labels(self) -> typing.List[str]:
+        if self.basic_info.position == "QB":
+            return PassingStats.all_stat_labels() + RushingStats.all_stat_labels()
+        if self.basic_info.position == "RB":
+            return RushingStats.all_stat_labels() + ReceivingStats.all_stat_labels()
+        if self.basic_info.position in ["WR", "TE"]:
+            return ReceivingStats.all_stat_labels()
+        if self.basic_info.position == "DEF":
+            return DefenseStats.all_stat_labels()
+        if self.basic_info.position == "K":
+            return KickerStats.all_stat_labels()
+        assert False, f"Unknown position: {self.basic_info.position}"
 
 
 @dataclasses.dataclass
@@ -155,6 +138,12 @@ class RushingStats:
     average_attempts: float
     average_touchdowns: float
     average_yards: float
+    rush_attempts_20: int
+    rush_attempts_10: int
+    rush_attempts_5: int
+    rush_percent_20: float
+    rush_percent_10: float
+    rush_percent_5: float
 
     def get_values_as_list(self) -> typing.List[typing.Any]:
         return [
@@ -164,6 +153,12 @@ class RushingStats:
             self.average_attempts,
             self.average_touchdowns,
             self.average_yards,
+            self.rush_attempts_20,
+            self.rush_attempts_10,
+            self.rush_attempts_5,
+            self.rush_percent_20,
+            self.rush_percent_10,
+            self.rush_percent_5,
         ]
 
     @staticmethod
@@ -175,6 +170,12 @@ class RushingStats:
             "Average Rushing Attempts",
             "Average Rushing Touchdowns",
             "Average Rushing Yards",
+            "Rush Attempts from 20",
+            "Rush Attempts from 10",
+            "Rush Attempts from 5",
+            "Rush Percent from 20",
+            "Rush Percent from 10",
+            "Rush Percent from 5",
         ]
 
     @staticmethod
@@ -186,6 +187,12 @@ class RushingStats:
             average_attempts=row["AVG_RUSH_ATT"],
             average_touchdowns=row["AVG_RUSH_TDS"],
             average_yards=row["AVG_RUSH_YDS"],
+            rush_attempts_20=row["20_YD_ATT"],
+            rush_attempts_10=row["10_YD_ATT"],
+            rush_attempts_5=row["5_YD_ATT"],
+            rush_percent_20=row["20_YD_%RUSH"],
+            rush_percent_10=row["10_YD_%RUSH"],
+            rush_percent_5=row["5_YD_%RUSH"],
         )
 
 
@@ -199,6 +206,10 @@ class ReceivingStats:
     average_touchdowns: float
     average_yards: float
     average_targets: float
+    targets_20: int
+    targets_10: int
+    targets_percent_20: float
+    targets_percent_10: float
 
     def get_values_as_list(self) -> typing.List[typing.Any]:
         return [
@@ -210,6 +221,10 @@ class ReceivingStats:
             self.average_touchdowns,
             self.average_yards,
             self.average_targets,
+            self.targets_20,
+            self.targets_10,
+            self.targets_percent_20,
+            self.targets_percent_10,
         ]
 
     @staticmethod
@@ -223,6 +238,10 @@ class ReceivingStats:
             "Average Receiving Touchdowns",
             "Average Receiving Yards",
             "Average Targets",
+            "Targets from 20",
+            "Targets from 10",
+            "Targets Percent from 20",
+            "Targets Percent from 10",
         ]
 
     @staticmethod
@@ -236,6 +255,10 @@ class ReceivingStats:
             average_touchdowns=row["AVG_REC_TDS"],
             average_yards=row["AVG_REC_YDS"],
             average_targets=row["AVG_TGT"],
+            targets_20=row["20_YD_TGT"],
+            targets_10=row["10_YD_TGT"],
+            targets_percent_20=row["20_YD_%TGT"],
+            targets_percent_10=row["10_YD_%TGT"],
         )
 
 

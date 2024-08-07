@@ -1,25 +1,71 @@
+<!-- draft/templates/draft/live_draft.html -->
+
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Coming Soon</title>
-    <style>
-        body {
-            text-align: center;
-            padding: 100px;
-            font-family: Arial, sans-serif;
-        }
-        h1 {
-            font-size: 36px;
-            margin-bottom: 30px;
-        }
-        p {
-            font-size: 18px;
-            margin-bottom: 20px;
-        }
-    </style>
+    <title>Live Draft Assistant</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'draft/live_draft.css' %}">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        const changePositionUrl = "{% url 'change_position' %}";
+        const csrfToken = "{{ csrf_token }}";
+    </script>
+    <script src="{% static 'draft/live_draft.js' %}"></script>
 </head>
 <body>
-    <h1>Coming Soon</h1>
-    <p>This page is a soon-to-be-released feature. Please check back later for updates.</p>
+    <h1>Live Draft Assistant</h1>
+    
+    <div class="dropdown">
+        <button onclick="toggleDropdown()" class="dropbtn">Select Columns</button>
+        <div id="myDropdown" class="dropdown-content">
+            {% for header in headers %}
+                <label class="dropdown-item">
+                    <input type="checkbox" checked value="{{ column }}" onclick="selectColumn({{ forloop.counter0 }})"> {{ header }} 
+                </label>
+            {% endfor %}
+        </div>
+    </div>
+
+    <br>
+    <br>
+
+    <button type="button" onclick="changePosition('all')">All</button>
+    <button type="button" onclick="changePosition('qb')">QB</button>
+    <button type="button" onclick="changePosition('rb')">RB</button>
+    <button type="button" onclick="changePosition('wr')">WR</button>
+    <button type="button" onclick="changePosition('te')">TE</button>
+    <button type="button" onclick="changePosition('k')">K</button>
+    <button type="button" onclick="changePosition('def')">DEF</button>
+
+    <br>
+    <br>
+
+    <button type="button" onclick="getPPRVersion()">PPR</button>
+    <button type="button" onclick="getStandardVersion()">Standard</button>
+    
+    {% if error_message %}
+        <p>{{ error_message }}</p>
+    {% else %}
+        <table id="playersTable">
+            <thead>
+                <tr>
+                    {% for header in headers %}
+                        <th>{{ header }}</th>
+                    {% endfor %}
+                </tr>
+                </tr>
+            </thead>
+            <tbody>
+                {% for player in players %}
+                    <tr onclick="highlightRow(this)">
+                        {% for stat in player %}
+                            <td>{{ stat }}</td>
+                        {% endfor %}
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
 </body>
 </html>

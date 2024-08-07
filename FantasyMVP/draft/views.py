@@ -3,6 +3,7 @@ from django.conf import settings
 from django.forms import ValidationError
 from django.http import HttpRequest, HttpResponse, JsonResponse
 from django.shortcuts import render
+from django.views.decorators.csrf import csrf_exempt
 
 from .parse_csv import read_player_stats, sort_players
 from .player import *
@@ -14,6 +15,27 @@ def home(request: HttpRequest) -> HttpResponse:
 
 def mock_draft(request: HttpRequest) -> HttpResponse:
     return render(request, "draft/mock_draft.html")
+
+
+@csrf_exempt
+def change_position(request):
+    if request.method == "POST":
+        position = request.POST.get("position")
+        players = read_player_stats(settings.CSV_FILE_PATH)
+        players = sort_players(players, False).values()
+
+        if position != "all":
+            players = [p for p in players if p.basic_info.position.lower() == position]
+
+        row_values = [
+            p.basic_info.get_values_as_list() + p.standard_stats.get_values_as_list()
+            for p in players
+        ]
+        row_headers = BasicInfo.all_stat_labels() + StandardStats.all_stat_labels()
+
+        return JsonResponse({"players": row_values, "headers": row_headers})
+
+    return JsonResponse({"error": "Invalid request"}, status=400)
 
 
 def live_draft(request: HttpRequest) -> HttpResponse:

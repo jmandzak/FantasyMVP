@@ -20,4 +20,5 @@ urlpatterns = [
     path("ppr-k-statistics/", views.k_statistics, name="ppr_k_statistics"),
     path("def-statistics/", views.def_statistics, name="def_statistics"),
     path("ppr-def-statistics/", views.def_statistics, name="ppr_def_statistics"),
+    path("change_position/", views.change_position, name="change_position"),
 ]

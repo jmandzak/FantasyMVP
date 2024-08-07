@@ -22,18 +22,25 @@ def change_position(request):
     if request.method == "POST":
         position = request.POST.get("position")
         players = read_player_stats(settings.CSV_FILE_PATH)
-        players = sort_players(players, False).values()
+        players = list(sort_players(players, False).values())
 
         if position != "all":
             players = [p for p in players if p.basic_info.position.lower() == position]
 
+        global PPR
         row_values = [
-            p.basic_info.get_values_as_list() + p.standard_stats.get_values_as_list()
+            p.basic_info.get_values_as_list() + p.scoring_based_stats(PPR)
             for p in players
         ]
-        row_headers = BasicInfo.all_stat_labels() + StandardStats.all_stat_labels()
+        header_labels = [
+            BasicInfo.all_stat_labels() + p.scoring_based_labels(PPR) for p in players
+        ][0]
+        if position != "all":
+            for row, player in zip(row_values, players):
+                row.extend(player.position_based_stats())
+            header_labels.extend(players[0].position_based_labels())
 
-        return JsonResponse({"players": row_values, "headers": row_headers})
+        return JsonResponse({"players": row_values, "headers": header_labels})
 
     return JsonResponse({"error": "Invalid request"}, status=400)
 
@@ -57,6 +64,8 @@ def live_draft(request: HttpRequest) -> HttpResponse:
                 )
             if ppr not in ["yes", "no"]:
                 raise ValidationError("PPR must be 'yes' or 'no'.")
+            global PPR
+            PPR = ppr == "yes"
 
             form_data = {
                 "total_teams": total_teams,

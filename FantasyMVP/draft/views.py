@@ -8,6 +8,8 @@ from django.views.decorators.csrf import csrf_exempt
 from .parse_csv import read_player_stats, sort_players
 from .player import *
 
+PPR = False
+
 
 def home(request: HttpRequest) -> HttpResponse:
     return render(request, "draft/home.html")
@@ -47,6 +49,7 @@ def change_position(request):
 
 def live_draft(request: HttpRequest) -> HttpResponse:
     errors = []
+    global PPR
 
     if request.method == "POST":
         total_teams = request.POST["total_teams"]
@@ -64,7 +67,6 @@ def live_draft(request: HttpRequest) -> HttpResponse:
                 )
             if ppr not in ["yes", "no"]:
                 raise ValidationError("PPR must be 'yes' or 'no'.")
-            global PPR
             PPR = ppr == "yes"
 
             form_data = {
@@ -78,12 +80,11 @@ def live_draft(request: HttpRequest) -> HttpResponse:
         form_data = {}
 
     players = read_player_stats(settings.CSV_FILE_PATH)
-    players = sort_players(players, False).values()
+    players = list(sort_players(players, False).values())
     row_values = [
-        p.basic_info.get_values_as_list() + p.standard_stats.get_values_as_list()
-        for p in players
+        p.basic_info.get_values_as_list() + p.scoring_based_stats(PPR) for p in players
     ]
-    row_headers = BasicInfo.all_stat_labels() + StandardStats.all_stat_labels()
+    row_headers = BasicInfo.all_stat_labels() + players[0].scoring_based_labels(PPR)
 
     return render(
         request,

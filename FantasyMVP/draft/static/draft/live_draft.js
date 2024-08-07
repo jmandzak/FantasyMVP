@@ -137,6 +137,23 @@ function toggleColumn(columnIndex) {
     });
 }
 
+function highlightRow(row) {
+    // Check if row is already highlighted
+    if (row.classList.contains('highlight')) {
+        row.classList.remove('highlight');
+        return;
+    }
+    
+    // Remove highlight from all rows
+    var rows = document.querySelectorAll('tr');
+    rows.forEach(function(r) {
+        r.classList.remove('highlight');
+    });
+
+    // Add highlight to the clicked row
+    row.classList.add('highlight');
+}
+
 // Set column headers as sortable on document ready
 document.addEventListener("DOMContentLoaded", function() {
     let headers = document.querySelectorAll("#playersTable tr:first-child th");

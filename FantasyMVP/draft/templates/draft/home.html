@@ -2,6 +2,11 @@
 <html>
 <head>
     <title>Fantasy MVP</title>
+    <style>
+        #live-draft-form {
+            display: none;
+        }
+    </style>
 </head>
 <body>
     <h1>Welcome to FantasyMVP!</h1>
@@ -9,6 +14,32 @@
     <!-- Create three buttons: Statistics, Mock Draft, and Live Draft that lead to the respective pages. -->
     <button type="button" onclick="location.href='/all-statistics'">Statistics</button>
     <button type="button" onclick="location.href='/mock-draft'">Mock Draft</button>
-    <button type="button" onclick="location.href='/live-draft'">Live Draft</button>
+    <button type="button" onclick="showLiveDraftForm()">Live Draft</button>
+
+    <!-- Hidden form for Live Draft -->
+    <form id="live-draft-form" action="/live-draft/" method="post">
+        {% csrf_token %}
+        <h2>Live Draft Form</h2>
+        <label for="total-teams">Total Teams:</label>
+        <input type="number" id="total-teams" name="total_teams" min="1" max="32" required><br><br>
+        
+        <label for="draft-position">Draft Position:</label>
+        <input type="number" id="draft-position" name="draft_position" min="1" required><br><br>
+        
+        <label for="ppr">PPR:</label>
+        <select id="ppr" name="ppr" required>
+            <option value="yes">Yes</option>
+            <option value="no">No</option>
+        </select><br><br>
+        
+        <button type="submit">Submit</button>
+    </form>
+
+    <script>
+        function showLiveDraftForm() {
+            document.getElementById('live-draft-form').style.display = 'block';
+        }
+    </script>
+
 </body>
 </html>

@@ -1,6 +1,7 @@
 # Create your views here.
 from django.conf import settings
-from django.http import HttpRequest, HttpResponse
+from django.forms import ValidationError
+from django.http import HttpRequest, HttpResponse, JsonResponse
 from django.shortcuts import render
 
 from .parse_csv import read_player_stats, sort_players
@@ -16,7 +17,48 @@ def mock_draft(request: HttpRequest) -> HttpResponse:
 
 
 def live_draft(request: HttpRequest) -> HttpResponse:
-    return render(request, "draft/live_draft.html")
+    errors = []
+
+    if request.method == "POST":
+        total_teams = request.POST["total_teams"]
+        draft_position = request.POST["draft_position"]
+        ppr = request.POST["ppr"]
+
+        try:
+            total_teams = int(total_teams)
+            draft_position = int(draft_position)
+            if total_teams < 1 or total_teams > 32:
+                raise ValidationError("Total teams must be between 1 and 32.")
+            if draft_position < 1 or draft_position > total_teams:
+                raise ValidationError(
+                    "Draft position must be between 1 and the total number of teams."
+                )
+            if ppr not in ["yes", "no"]:
+                raise ValidationError("PPR must be 'yes' or 'no'.")
+
+            form_data = {
+                "total_teams": total_teams,
+                "draft_position": draft_position,
+                "ppr": ppr,
+            }
+        except (ValueError, ValidationError) as e:
+            errors.append(str(e))
+    else:
+        form_data = {}
+
+    players = read_player_stats(settings.CSV_FILE_PATH)
+    players = sort_players(players, False).values()
+    row_values = [
+        p.basic_info.get_values_as_list() + p.standard_stats.get_values_as_list()
+        for p in players
+    ]
+    row_headers = BasicInfo.all_stat_labels() + StandardStats.all_stat_labels()
+
+    return render(
+        request,
+        "draft/live_draft.html",
+        {"players": row_values, "headers": row_headers, "form_data": form_data},
+    )
 
 
 def all_statistics(request: HttpRequest) -> HttpResponse:

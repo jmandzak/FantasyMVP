@@ -9,6 +9,8 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
         const changePositionUrl = "{% url 'change_position' %}";
+        const draftPlayerUrl = "{% url 'draft_player' %}";
+        const removePlayerUrl = "{% url 'remove_player' %}";
         const csrfToken = "{{ csrf_token }}";
     </script>
     <script src="{% static 'draft/live_draft.js' %}"></script>
@@ -41,8 +43,8 @@
     <br>
     <br>
 
-    <button type="button" onclick="getPPRVersion()">PPR</button>
-    <button type="button" onclick="getStandardVersion()">Standard</button>
+    <button type="button" onclick="draftPlayer()">Draft</button>
+    <button type="button" onclick="removePlayer()">Remove</button>
     
     {% if error_message %}
         <p>{{ error_message }}</p>

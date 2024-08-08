@@ -1,3 +1,5 @@
+let CURRENT_POSITION = "all";
+
 function toggleDropdown() {
     document.getElementById("myDropdown").classList.toggle("show");
 }
@@ -8,6 +10,7 @@ function selectColumn(index) {
 }
 
 function changePosition(position) {
+    CURRENT_POSITION = position;
     const xhr = new XMLHttpRequest();
     xhr.open("POST", changePositionUrl, true);
     xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
@@ -47,16 +50,11 @@ function updatePlayersTable(players, headers) {
             td.textContent = cell;
             row.appendChild(td);
         });
+        row.onclick = function() {
+            highlightRow(row);
+        };
         tbody.appendChild(row);
     });
-}
-
-function getPPRVersion() {
-    return;
-}
-
-function getStandardVersion() {
-    return;
 }
 
 function sortTable(columnIndex, dataType) {
@@ -152,6 +150,62 @@ function highlightRow(row) {
 
     // Add highlight to the clicked row
     row.classList.add('highlight');
+}
+
+function draftPlayer() {
+    // Find the highlighted row
+    var rows = document.querySelectorAll('tr');
+    var playerRow;
+    rows.forEach(function(row) {
+        if (row.classList.contains('highlight')) {
+            playerRow = row;
+        }
+    });
+    // Get the player name from the row, which is in the first cell
+    var playerName = playerRow.getElementsByTagName('td')[0].innerHTML;
+    // Send the player name to the server
+    const xhr = new XMLHttpRequest();
+    xhr.open("POST", draftPlayerUrl, true);
+    xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+    xhr.setRequestHeader("X-CSRFToken", csrfToken);
+
+    xhr.onreadystatechange = function () {
+        if (xhr.readyState === 4 && xhr.status === 200) {
+            const response = JSON.parse(xhr.responseText);
+            updatePlayersTable(response.players, response.headers);
+        }
+    }
+
+    // send playerName and current position
+    xhr.send("player_name=" + playerName + "&position=" + CURRENT_POSITION);
+}
+
+function removePlayer() {
+    // Find the highlighted row
+    var rows = document.querySelectorAll('tr');
+    var playerRow;
+    rows.forEach(function(row) {
+        if (row.classList.contains('highlight')) {
+            playerRow = row;
+        }
+    });
+    // Get the player name from the row, which is in the first cell
+    var playerName = playerRow.getElementsByTagName('td')[0].innerHTML;
+    // Send the player name to the server
+    const xhr = new XMLHttpRequest();
+    xhr.open("POST", removePlayerUrl, true);
+    xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+    xhr.setRequestHeader("X-CSRFToken", csrfToken);
+
+    xhr.onreadystatechange = function () {
+        if (xhr.readyState === 4 && xhr.status === 200) {
+            const response = JSON.parse(xhr.responseText);
+            updatePlayersTable(response.players, response.headers);
+        }
+    }
+
+    // send playerName and current position
+    xhr.send("player_name=" + playerName + "&position=" + CURRENT_POSITION);
 }
 
 // Set column headers as sortable on document ready

@@ -21,4 +21,6 @@ urlpatterns = [
     path("def-statistics/", views.def_statistics, name="def_statistics"),
     path("ppr-def-statistics/", views.def_statistics, name="ppr_def_statistics"),
     path("change_position/", views.change_position, name="change_position"),
+    path("draft_player/", views.draft_player, name="draft_player"),
+    path("remove_player/", views.remove_player, name="remove_player"),
 ]

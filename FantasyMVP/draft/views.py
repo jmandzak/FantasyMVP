@@ -9,6 +9,8 @@ from .parse_csv import read_player_stats, sort_players
 from .player import *
 
 PPR = False
+MY_DRAFTED_PLAYERS: typing.List[str] = []
+OTHER_DRAFTED_PLAYERS: typing.List[str] = []
 
 
 def home(request: HttpRequest) -> HttpResponse:
@@ -19,28 +21,89 @@ def mock_draft(request: HttpRequest) -> HttpResponse:
     return render(request, "draft/mock_draft.html")
 
 
+def _get_players(position) -> typing.List[Player]:
+    players = read_player_stats(settings.CSV_FILE_PATH)
+    players = list(sort_players(players, False).values())
+    if position != "all":
+        players = [p for p in players if p.basic_info.position.lower() == position]
+    players = [
+        p
+        for p in players
+        if p.basic_info.name not in MY_DRAFTED_PLAYERS + OTHER_DRAFTED_PLAYERS
+    ]
+    return players
+
+
+def _get_row_values(
+    players: typing.List[Player], position: str
+) -> typing.List[typing.List[str]]:
+    row_values = [
+        p.basic_info.get_values_as_list() + p.scoring_based_stats(PPR) for p in players
+    ]
+    if position != "all":
+        for row, player in zip(row_values, players):
+            row.extend(player.position_based_stats())
+    return row_values
+
+
+def _get_column_headers(
+    players: typing.List[Player], position: str
+) -> typing.List[str]:
+    header_labels = BasicInfo.all_stat_labels() + players[0].scoring_based_labels(PPR)
+    if position != "all":
+        header_labels.extend(players[0].position_based_labels())
+    return header_labels
+
+
+def _add_player_to_my_drafted_players(player_name: str):
+    global MY_DRAFTED_PLAYERS
+    MY_DRAFTED_PLAYERS.append(player_name)
+
+
+def _add_player_to_other_drafted_players(player_name: str):
+    global OTHER_DRAFTED_PLAYERS
+    OTHER_DRAFTED_PLAYERS.append(player_name)
+
+
+@csrf_exempt
+def draft_player(request):
+    if request.method == "POST":
+        global MY_DRAFTED_PLAYERS
+        player_name = request.POST.get("player_name")
+        position = request.POST.get("position")
+        _add_player_to_my_drafted_players(player_name)
+        players = _get_players(position)
+        row_values = _get_row_values(players, position)
+        header_labels = _get_column_headers(players, position)
+
+        return JsonResponse({"players": row_values, "headers": header_labels})
+
+    return JsonResponse({"error": "Invalid request"}, status=400)
+
+
+@csrf_exempt
+def remove_player(request):
+    if request.method == "POST":
+        global OTHER_DRAFTED_PLAYERS
+        player_name = request.POST.get("player_name")
+        position = request.POST.get("position")
+        _add_player_to_other_drafted_players(player_name)
+        players = _get_players(position)
+        row_values = _get_row_values(players, position)
+        header_labels = _get_column_headers(players, position)
+
+        return JsonResponse({"players": row_values, "headers": header_labels})
+
+    return JsonResponse({"error": "Invalid request"}, status=400)
+
+
 @csrf_exempt
 def change_position(request):
     if request.method == "POST":
         position = request.POST.get("position")
-        players = read_player_stats(settings.CSV_FILE_PATH)
-        players = list(sort_players(players, False).values())
-
-        if position != "all":
-            players = [p for p in players if p.basic_info.position.lower() == position]
-
-        global PPR
-        row_values = [
-            p.basic_info.get_values_as_list() + p.scoring_based_stats(PPR)
-            for p in players
-        ]
-        header_labels = [
-            BasicInfo.all_stat_labels() + p.scoring_based_labels(PPR) for p in players
-        ][0]
-        if position != "all":
-            for row, player in zip(row_values, players):
-                row.extend(player.position_based_stats())
-            header_labels.extend(players[0].position_based_labels())
+        players = _get_players(position)
+        row_values = _get_row_values(players, position)
+        header_labels = _get_column_headers(players, position)
 
         return JsonResponse({"players": row_values, "headers": header_labels})
 

@@ -1,0 +1,89 @@
+/* styles.css */
+
+table thead tr th {
+    /* you could also change td instead th depending your html code */
+        background-color: lightgreen;
+        position: sticky;
+        z-index: 2;
+        top: 0;
+        padding: 8px;
+    }
+    
+    table tbody td:first-child {
+        background-color: lightcyan;
+        position: sticky;
+        z-index: 1;
+        top: 0;
+        padding: 8px;
+        left: 0;
+    }
+    
+    table td {
+        padding: 8px;
+        text-align: left;
+        border-bottom: 1px solid #ddd;
+        z-index: 0;
+    }
+      
+    tr:nth-child(even) {
+    background-color: lightgray;
+    }
+    
+    .hidden-column {
+        display: none;
+    }
+    
+    /* Dropdown Button */
+    .dropbtn {
+        background-color: #4CAF50;
+        color: white;
+        padding: 10px;
+        font-size: 14px;
+        border: none;
+        cursor: pointer;
+    }
+    
+    /* The container <div> - needed to position the dropdown content */
+    .dropdown {
+        position: relative;
+        display: inline-block;
+    }
+    
+    /* Dropdown Content (Hidden by Default) */
+    .dropdown-content {
+        display: none;
+        position: absolute;
+        background-color: #f9f9f9;
+        min-width: 160px;
+        max-height: 200px; /* Limit height */
+        overflow-y: auto;  /* Add scrollbar for overflow */
+        box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+        z-index: 4;
+    }
+    
+    /* Links inside the dropdown */
+    .dropdown-item {
+        color: black;
+        padding: 8px 12px; /* Reduced padding */
+        text-decoration: none;
+        display: block;
+        font-size: 14px; /* Reduced font size */
+        z-index: 4;
+    }
+    
+    /* Change color of dropdown links on hover */
+    .dropdown-item:hover {background-color: #f1f1f1}
+    
+    /* Show the dropdown menu (use JS to add this class to the .dropdown-content container when the user clicks on the dropdown button) */
+    .show {display: block;}
+    
+    tr.highlight {
+        background-color: yellow !important;
+    }
+    
+    tr.highlight td:first-child {
+        background-color: yellow !important;
+        z-index: 3; /* Ensure it is above other elements */
+        position: sticky; /* Maintain sticky position */
+        left: 0; /* Ensure it stays in place */
+    }

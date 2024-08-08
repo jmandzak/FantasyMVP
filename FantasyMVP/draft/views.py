@@ -65,6 +65,13 @@ def _add_player_to_other_drafted_players(player_name: str):
     OTHER_DRAFTED_PLAYERS.append(player_name)
 
 
+def _clear_draft_data():
+    global MY_DRAFTED_PLAYERS
+    global OTHER_DRAFTED_PLAYERS
+    MY_DRAFTED_PLAYERS = []
+    OTHER_DRAFTED_PLAYERS = []
+
+
 @csrf_exempt
 def draft_player(request):
     if request.method == "POST":
@@ -113,6 +120,7 @@ def change_position(request):
 def live_draft(request: HttpRequest) -> HttpResponse:
     errors = []
     global PPR
+    _clear_draft_data()
 
     if request.method == "POST":
         total_teams = request.POST["total_teams"]
@@ -142,12 +150,9 @@ def live_draft(request: HttpRequest) -> HttpResponse:
     else:
         form_data = {}
 
-    players = read_player_stats(settings.CSV_FILE_PATH)
-    players = list(sort_players(players, False).values())
-    row_values = [
-        p.basic_info.get_values_as_list() + p.scoring_based_stats(PPR) for p in players
-    ]
-    row_headers = BasicInfo.all_stat_labels() + players[0].scoring_based_labels(PPR)
+    players = _get_players("all")
+    row_values = _get_row_values(players, "all")
+    row_headers = _get_column_headers(players, "all")
 
     return render(
         request,

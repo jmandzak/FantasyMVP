@@ -20,6 +20,7 @@ function changePosition(position) {
         if (xhr.readyState === 4 && xhr.status === 200) {
             const response = JSON.parse(xhr.responseText);
             updatePlayersTable(response.players, response.headers);
+            setSortListener();
         }
     };
 
@@ -173,6 +174,7 @@ function draftPlayer() {
         if (xhr.readyState === 4 && xhr.status === 200) {
             const response = JSON.parse(xhr.responseText);
             updatePlayersTable(response.players, response.headers);
+            setSortListener();
         }
     }
 
@@ -201,6 +203,7 @@ function removePlayer() {
         if (xhr.readyState === 4 && xhr.status === 200) {
             const response = JSON.parse(xhr.responseText);
             updatePlayersTable(response.players, response.headers);
+            setSortListener();
         }
     }
 
@@ -208,8 +211,7 @@ function removePlayer() {
     xhr.send("player_name=" + playerName + "&position=" + CURRENT_POSITION);
 }
 
-// Set column headers as sortable on document ready
-document.addEventListener("DOMContentLoaded", function() {
+function setSortListener() {
     let headers = document.querySelectorAll("#playersTable tr:first-child th");
     headers.forEach(function(header, index) {
         header.addEventListener("click", function() {
@@ -222,7 +224,23 @@ document.addEventListener("DOMContentLoaded", function() {
             sortTable(index, dataType);
         });
     });
-});
+}
+
+// // Set column headers as sortable on document ready
+// document.addEventListener("DOMContentLoaded", function() {
+//     let headers = document.querySelectorAll("#playersTable tr:first-child th");
+//     headers.forEach(function(header, index) {
+//         header.addEventListener("click", function() {
+//             // Look at the first row to determine the data type of the column
+//             let dataType = "string";
+//             let cells = document.querySelectorAll("#playersTable tr:nth-child(2) td");
+//             if (!isNaN(cells[index].innerHTML)) {
+//                 dataType = "number";
+//             }
+//             sortTable(index, dataType);
+//         });
+//     });
+// });
 
 // Close the dropdown menu if the user clicks outside of it
 window.onclick = function(event) {

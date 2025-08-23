@@ -20,6 +20,9 @@ class Player:
         self.receiver_stats = ReceivingStats.from_csv_row(csv_row)
         self.defense_stats = DefenseStats.from_csv_row(csv_row)
         self.kicker_stats = KickerStats.from_csv_row(csv_row)
+        self.snap_share_stats = SnapShareStats.from_csv_row(csv_row)
+        self.team_target_share_stats = TeamTargetShareStats.from_csv_row(csv_row)
+        self.advanced_receiver_stats = AdvancedReceivingStats.from_csv_row(csv_row)
 
     def scoring_based_stats(self, ppr: bool) -> typing.List[typing.Any]:
         if ppr:
@@ -36,9 +39,20 @@ class Player:
             return (
                 self.runningback_stats.get_values_as_list()
                 + self.receiver_stats.get_values_as_list()
+                + self.snap_share_stats.get_values_as_list()
+                + self.team_target_share_stats.get_values_as_list(
+                    self.basic_info.position
+                )
             )
         if self.basic_info.position in ["WR", "TE"]:
-            return self.receiver_stats.get_values_as_list()
+            return (
+                self.receiver_stats.get_values_as_list()
+                + self.snap_share_stats.get_values_as_list()
+                + self.advanced_receiver_stats.get_values_as_list()
+                + self.team_target_share_stats.get_values_as_list(
+                    self.basic_info.position
+                )
+            )
         if self.basic_info.position == "DEF":
             return self.defense_stats.get_values_as_list()
         if self.basic_info.position == "K":
@@ -54,9 +68,13 @@ class Player:
         if self.basic_info.position == "QB":
             return PassingStats.all_stat_labels() + RushingStats.all_stat_labels()
         if self.basic_info.position == "RB":
-            return RushingStats.all_stat_labels() + ReceivingStats.all_stat_labels()
+            return (
+                RushingStats.all_stat_labels()
+                + ReceivingStats.all_stat_labels()
+                + SnapShareStats.all_stat_labels()
+            )
         if self.basic_info.position in ["WR", "TE"]:
-            return ReceivingStats.all_stat_labels()
+            return ReceivingStats.all_stat_labels() + SnapShareStats.all_stat_labels()
         if self.basic_info.position == "DEF":
             return DefenseStats.all_stat_labels()
         if self.basic_info.position == "K":
@@ -78,6 +96,23 @@ class PassingStats:
     average_completion_percent: float
     average_touchdowns: float
     average_yards: float
+    pass_air_yds: int
+    pass_air_yds_per_att: float
+    pass_10_yds: int
+    pass_20_yds: int
+    pass_30_yds: int
+    pass_40_yds: int
+    pass_50_yds: int
+    pocket_time: float
+    blitz: int
+    poor_pass: int
+    avg_pass_10_yds: float
+    avg_pass_20_yds: float
+    avg_pass_30_yds: float
+    avg_pass_40_yds: float
+    avg_pass_50_yds: float
+    avg_blitz: float
+    avg_poor_pass: float
 
     def get_values_as_list(self) -> typing.List[typing.Any]:
         return [
@@ -93,6 +128,23 @@ class PassingStats:
             self.average_completion_percent,
             self.average_touchdowns,
             self.average_yards,
+            self.pass_air_yds,
+            self.pass_air_yds_per_att,
+            self.pass_10_yds,
+            self.pass_20_yds,
+            self.pass_30_yds,
+            self.pass_40_yds,
+            self.pass_50_yds,
+            self.pocket_time,
+            self.blitz,
+            self.poor_pass,
+            self.avg_pass_10_yds,
+            self.avg_pass_20_yds,
+            self.avg_pass_30_yds,
+            self.avg_pass_40_yds,
+            self.avg_pass_50_yds,
+            self.avg_blitz,
+            self.avg_poor_pass,
         ]
 
     @staticmethod
@@ -110,6 +162,23 @@ class PassingStats:
             "Average Passing Completion Percent",
             "Average Passing Touchdowns",
             "Average Passing Yards",
+            "Pass Air Yards",
+            "Pass Air Yards per Attempt",
+            "Passes 10+ Yards",
+            "Passes 20+ Yards",
+            "Passes 30+ Yards",
+            "Passes 40+ Yards",
+            "Passes 50+ Yards",
+            "Pocket Time",
+            "Blitz",
+            "Poor Pass",
+            "Avg Passes 10+ Yards",
+            "Avg Passes 20+ Yards",
+            "Avg Passes 30+ Yards",
+            "Avg Passes 40+ Yards",
+            "Avg Passes 50+ Yards",
+            "Avg Blitz",
+            "Avg Poor Pass",
         ]
 
     @staticmethod
@@ -127,6 +196,23 @@ class PassingStats:
             average_completion_percent=row["AVG_PASS_PCT"],
             average_touchdowns=row["AVG_PASS_TDS"],
             average_yards=row["AVG_YDS"],
+            pass_air_yds=row["PASS_AIR_YDS"],
+            pass_air_yds_per_att=row["PASS_AIR_YDS_PER_ATT"],
+            pass_10_yds=row["PASS_10_YDS"],
+            pass_20_yds=row["PASS_20_YDS"],
+            pass_30_yds=row["PASS_30_YDS"],
+            pass_40_yds=row["PASS_40_YDS"],
+            pass_50_yds=row["PASS_50_YDS"],
+            pocket_time=row["POCKET_TIME"],
+            blitz=row["BLITZ"],
+            poor_pass=row["POOR_PASS"],
+            avg_pass_10_yds=row["AVG_PASS_10_YDS"],
+            avg_pass_20_yds=row["AVG_PASS_20_YDS"],
+            avg_pass_30_yds=row["AVG_PASS_30_YDS"],
+            avg_pass_40_yds=row["AVG_PASS_40_YDS"],
+            avg_pass_50_yds=row["AVG_PASS_50_YDS"],
+            avg_blitz=row["AVG_BLITZ"],
+            avg_poor_pass=row["AVG_POOR_PASS"],
         )
 
 
@@ -144,6 +230,25 @@ class RushingStats:
     rush_percent_20: float
     rush_percent_10: float
     rush_percent_5: float
+    yds_before_contact: int
+    avg_yds_before_contact: float
+    yds_after_contact: int
+    avg_yds_after_contact: float
+    broken_tackles: int
+    tackle_loss: int
+    tackle_loss_yds: int
+    run_10_yds: int
+    run_20_yds: int
+    run_30_yds: int
+    run_40_yds: int
+    run_50_yds: int
+    longest_run: int
+    avg_broken_tackles: float
+    avg_run_10_yds: float
+    avg_run_20_yds: float
+    avg_run_30_yds: float
+    avg_run_40_yds: float
+    avg_run_50_yds: float
 
     def get_values_as_list(self) -> typing.List[typing.Any]:
         return [
@@ -159,6 +264,25 @@ class RushingStats:
             self.rush_percent_20,
             self.rush_percent_10,
             self.rush_percent_5,
+            self.yds_before_contact,
+            self.avg_yds_before_contact,
+            self.yds_after_contact,
+            self.avg_yds_after_contact,
+            self.broken_tackles,
+            self.tackle_loss,
+            self.tackle_loss_yds,
+            self.run_10_yds,
+            self.run_20_yds,
+            self.run_30_yds,
+            self.run_40_yds,
+            self.run_50_yds,
+            self.longest_run,
+            self.avg_broken_tackles,
+            self.avg_run_10_yds,
+            self.avg_run_20_yds,
+            self.avg_run_30_yds,
+            self.avg_run_40_yds,
+            self.avg_run_50_yds,
         ]
 
     @staticmethod
@@ -176,6 +300,25 @@ class RushingStats:
             "Rush Percent from 20",
             "Rush Percent from 10",
             "Rush Percent from 5",
+            "Yards Before Contact",
+            "Avg Yards Before Contact",
+            "Yards After Contact",
+            "Avg Yards After Contact",
+            "Broken Tackles",
+            "Tackle for Loss",
+            "Tackle for Loss Yards",
+            "Runs 10+ Yards",
+            "Runs 20+ Yards",
+            "Runs 30+ Yards",
+            "Runs 40+ Yards",
+            "Runs 50+ Yards",
+            "Longest Run",
+            "Avg Broken Tackles",
+            "Avg Runs 10+ Yards",
+            "Avg Runs 20+ Yards",
+            "Avg Runs 30+ Yards",
+            "Avg Runs 40+ Yards",
+            "Avg Runs 50+ Yards",
         ]
 
     @staticmethod
@@ -193,6 +336,25 @@ class RushingStats:
             rush_percent_20=row["20_YD_%RUSH"],
             rush_percent_10=row["10_YD_%RUSH"],
             rush_percent_5=row["5_YD_%RUSH"],
+            yds_before_contact=row["YDS_BEFORE_CONTACT"],
+            avg_yds_before_contact=row["AVG_YDS_BEFORE_CONTACT"],
+            yds_after_contact=row["YDS_AFTER_CONTACT"],
+            avg_yds_after_contact=row["AVG_YDS_AFTER_CONTACT"],
+            broken_tackles=row["BROKEN_TACKLES"],
+            tackle_loss=row["TACKLE_LOSS"],
+            tackle_loss_yds=row["TACKLE_LOSS_YDS"],
+            run_10_yds=row["RUN_10_YDS"],
+            run_20_yds=row["RUN_20_YDS"],
+            run_30_yds=row["RUN_30_YDS"],
+            run_40_yds=row["RUN_40_YDS"],
+            run_50_yds=row["RUN_50_YDS"],
+            longest_run=row["LONGEST_RUN"],
+            avg_broken_tackles=row["AVG_BROKEN_TACKLES"],
+            avg_run_10_yds=row["AVG_RUN_10_YDS"],
+            avg_run_20_yds=row["AVG_RUN_20_YDS"],
+            avg_run_30_yds=row["AVG_RUN_30_YDS"],
+            avg_run_40_yds=row["AVG_RUN_40_YDS"],
+            avg_run_50_yds=row["AVG_RUN_50_YDS"],
         )
 
 
@@ -259,6 +421,158 @@ class ReceivingStats:
             targets_10=row["10_YD_TGT"],
             targets_percent_20=row["20_YD_%TGT"],
             targets_percent_10=row["10_YD_%TGT"],
+        )
+
+
+@dataclasses.dataclass
+class AdvancedReceivingStats:
+    yds_before_catch: int
+    avg_yds_before_catch: float
+    rec_air_yds: int
+    avg_rec_air_yds: float
+    yac: int
+    avg_yac: float
+    yacon: int
+    avg_yacon: float
+    tgt_share: float
+    catchable: int
+    drop: int
+    rec_10_yds: int
+    rec_20_yds: int
+    rec_30_yds: int
+    rec_40_yds: int
+    rec_50_yds: int
+    longest_rec: int
+    avg_catchable: float
+    avg_drop: float
+    avg_rec_10_yds: float
+    avg_rec_20_yds: float
+    avg_rec_30_yds: float
+    avg_rec_40_yds: float
+    avg_rec_50_yds: float
+
+    def get_values_as_list(self) -> typing.List[typing.Any]:
+        return [
+            self.yds_before_catch,
+            self.avg_yds_before_catch,
+            self.rec_air_yds,
+            self.avg_rec_air_yds,
+            self.yac,
+            self.avg_yac,
+            self.yacon,
+            self.avg_yacon,
+            self.tgt_share,
+            self.catchable,
+            self.drop,
+            self.rec_10_yds,
+            self.rec_20_yds,
+            self.rec_30_yds,
+            self.rec_40_yds,
+            self.rec_50_yds,
+            self.longest_rec,
+            self.avg_catchable,
+            self.avg_drop,
+            self.avg_rec_10_yds,
+            self.avg_rec_20_yds,
+            self.avg_rec_30_yds,
+            self.avg_rec_40_yds,
+            self.avg_rec_50_yds,
+        ]
+
+    @staticmethod
+    def all_stat_labels() -> typing.List[str]:
+        return [
+            "Yards Before Catch",
+            "Avg Yards Before Catch",
+            "Receiving Air Yards",
+            "Avg Receiving Air Yards",
+            "Yards After Catch",
+            "Avg Yards After Catch",
+            "Yards After Contact",
+            "Avg Yards After Contact",
+            "Target Share %",
+            "Catchable Passes",
+            "Drops",
+            "Receptions 10+ Yards",
+            "Receptions 20+ Yards",
+            "Receptions 30+ Yards",
+            "Receptions 40+ Yards",
+            "Receptions 50+ Yards",
+            "Longest Reception",
+            "Avg Catchable Passes",
+            "Avg Drops",
+            "Avg Receptions 10+ Yards",
+            "Avg Receptions 20+ Yards",
+            "Avg Receptions 30+ Yards",
+            "Avg Receptions 40+ Yards",
+            "Avg Receptions 50+ Yards",
+        ]
+
+    @staticmethod
+    def from_csv_row(row: typing.Dict[str, typing.Any]) -> AdvancedReceivingStats:
+        return AdvancedReceivingStats(
+            yds_before_catch=row["YDS_BEFORE_CATCH"],
+            avg_yds_before_catch=row["AVG_YDS_BEFORE_CATCH"],
+            rec_air_yds=row["REC_AIR_YDS"],
+            avg_rec_air_yds=row["AVG_REC_AIR_YDS"],
+            yac=row["YAC"],
+            avg_yac=row["AVG_YAC"],
+            yacon=row["YACON"],
+            avg_yacon=row["AVG_YACON"],
+            tgt_share=row["TGT_SHARE"],
+            catchable=row["CATCHABLE"],
+            drop=row["DROP"],
+            rec_10_yds=row["REC_10_YDS"],
+            rec_20_yds=row["REC_20_YDS"],
+            rec_30_yds=row["REC_30_YDS"],
+            rec_40_yds=row["REC_40_YDS"],
+            rec_50_yds=row["REC_50_YDS"],
+            longest_rec=row["LONGEST_REC"],
+            avg_catchable=row["AVG_CATCHABLE"],
+            avg_drop=row["AVG_DROP"],
+            avg_rec_10_yds=row["AVG_REC_10_YDS"],
+            avg_rec_20_yds=row["AVG_REC_20_YDS"],
+            avg_rec_30_yds=row["AVG_REC_30_YDS"],
+            avg_rec_40_yds=row["AVG_REC_40_YDS"],
+            avg_rec_50_yds=row["AVG_REC_50_YDS"],
+        )
+
+
+@dataclasses.dataclass
+class TeamTargetShareStats:
+    wr_tgt_share_pct: float
+    rb_tgt_share_pct: float
+    te_tgt_share_pct: float
+
+    def get_values_as_list(self, position: str) -> typing.List[typing.Any]:
+        position = position.upper()
+        if position == "WR":
+            return [self.wr_tgt_share_pct]
+        elif position == "RB":
+            return [self.rb_tgt_share_pct]
+        elif position == "TE":
+            return [self.te_tgt_share_pct]
+        else:
+            raise ValueError(f"Unknown position: {position}")
+
+    @staticmethod
+    def all_stat_labels(position: str) -> typing.List[str]:
+        position = position.upper()
+        if position == "WR":
+            return ["WR Target Share %"]
+        elif position == "RB":
+            return ["RB Target Share %"]
+        elif position == "TE":
+            return ["TE Target Share %"]
+        else:
+            raise ValueError(f"Unknown position: {position}")
+
+    @staticmethod
+    def from_csv_row(row: typing.Dict[str, typing.Any]) -> TeamTargetShareStats:
+        return TeamTargetShareStats(
+            wr_tgt_share_pct=row["TEAM_WR_TGT_SHARE_PCT"],
+            rb_tgt_share_pct=row["TEAM_RB_TGT_SHARE_PCT"],
+            te_tgt_share_pct=row["TEAM_TE_TGT_SHARE_PCT"],
         )
 
 
@@ -433,6 +747,44 @@ class KickerStats:
             fg_30_39_average=row["AVG_30-39"],
             fg_40_49_average=row["AVG_40-49"],
             fg_50_plus_average=row["AVG_50+"],
+        )
+
+
+@dataclasses.dataclass
+class SnapShareStats:
+    snaps_per_game: float
+    snap_pct: float
+    util_pct: float
+    pts_100_snap: float
+    ppr_pts_100_snap: float
+
+    def get_values_as_list(self) -> typing.List[typing.Any]:
+        return [
+            self.snaps_per_game,
+            self.snap_pct,
+            self.util_pct,
+            self.pts_100_snap,
+            self.ppr_pts_100_snap,
+        ]
+
+    @staticmethod
+    def all_stat_labels() -> typing.List[str]:
+        return [
+            "Snaps per Game",
+            "Snap %",
+            "Utilization %",
+            "Points per 100 Snaps",
+            "PPR Points per 100 Snaps",
+        ]
+
+    @staticmethod
+    def from_csv_row(row: typing.Dict[str, typing.Any]) -> SnapShareStats:
+        return SnapShareStats(
+            snaps_per_game=row["SNAPS_PER_GAME"],
+            snap_pct=row["SNAP_PCT"],
+            util_pct=row["UTIL_PCT"],
+            pts_100_snap=row["PTS_100_SNAP"],
+            ppr_pts_100_snap=row["PPR_PTS_100_SNAP"],
         )
 
 

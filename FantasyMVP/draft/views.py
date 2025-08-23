@@ -225,6 +225,8 @@ def rb_statistics(request: HttpRequest) -> HttpResponse:
         + p.standard_stats.get_values_as_list()
         + p.runningback_stats.get_values_as_list()
         + p.receiver_stats.get_values_as_list()
+        + p.team_target_share_stats.get_values_as_list(p.basic_info.position)
+        + p.snap_share_stats.get_values_as_list()
         for p in players
     ]
     row_headers = (
@@ -232,6 +234,8 @@ def rb_statistics(request: HttpRequest) -> HttpResponse:
         + StandardStats.all_stat_labels()
         + RushingStats.all_stat_labels()
         + ReceivingStats.all_stat_labels()
+        + TeamTargetShareStats.all_stat_labels("RB")
+        + SnapShareStats.all_stat_labels()
     )
 
     return render(
@@ -250,6 +254,7 @@ def rb_ppr_statistics(request: HttpRequest) -> HttpResponse:
         + p.ppr_stats.get_values_as_list()
         + p.runningback_stats.get_values_as_list()
         + p.receiver_stats.get_values_as_list()
+        + p.team_target_share_stats.get_values_as_list(p.basic_info.position)
         for p in players
     ]
     row_headers = (
@@ -257,6 +262,8 @@ def rb_ppr_statistics(request: HttpRequest) -> HttpResponse:
         + PPRStats.all_stat_labels()
         + RushingStats.all_stat_labels()
         + ReceivingStats.all_stat_labels()
+        + TeamTargetShareStats.all_stat_labels("RB")
+        + SnapShareStats.all_stat_labels()
     )
 
     return render(
@@ -274,12 +281,18 @@ def wr_statistics(request: HttpRequest) -> HttpResponse:
         p.basic_info.get_values_as_list()
         + p.standard_stats.get_values_as_list()
         + p.receiver_stats.get_values_as_list()
+        + p.advanced_receiver_stats.get_values_as_list()
+        + p.team_target_share_stats.get_values_as_list(p.basic_info.position)
+        + p.snap_share_stats.get_values_as_list()
         for p in players
     ]
     row_headers = (
         BasicInfo.all_stat_labels()
         + StandardStats.all_stat_labels()
         + ReceivingStats.all_stat_labels()
+        + AdvancedReceivingStats.all_stat_labels()
+        + TeamTargetShareStats.all_stat_labels("WR")
+        + SnapShareStats.all_stat_labels()
     )
 
     return render(
@@ -297,12 +310,18 @@ def wr_ppr_statistics(request: HttpRequest) -> HttpResponse:
         p.basic_info.get_values_as_list()
         + p.ppr_stats.get_values_as_list()
         + p.receiver_stats.get_values_as_list()
+        + p.advanced_receiver_stats.get_values_as_list()
+        + p.team_target_share_stats.get_values_as_list(p.basic_info.position)
+        + p.snap_share_stats.get_values_as_list()
         for p in players
     ]
     row_headers = (
         BasicInfo.all_stat_labels()
         + PPRStats.all_stat_labels()
         + ReceivingStats.all_stat_labels()
+        + AdvancedReceivingStats.all_stat_labels()
+        + TeamTargetShareStats.all_stat_labels("WR")
+        + SnapShareStats.all_stat_labels()
     )
 
     return render(
@@ -320,12 +339,18 @@ def te_statistics(request: HttpRequest) -> HttpResponse:
         p.basic_info.get_values_as_list()
         + p.standard_stats.get_values_as_list()
         + p.receiver_stats.get_values_as_list()
+        + p.advanced_receiver_stats.get_values_as_list()
+        + p.team_target_share_stats.get_values_as_list(p.basic_info.position)
+        + p.snap_share_stats.get_values_as_list()
         for p in players
     ]
     row_headers = (
         BasicInfo.all_stat_labels()
         + StandardStats.all_stat_labels()
         + ReceivingStats.all_stat_labels()
+        + AdvancedReceivingStats.all_stat_labels()
+        + TeamTargetShareStats.all_stat_labels("TE")
+        + SnapShareStats.all_stat_labels()
     )
 
     return render(
@@ -343,12 +368,18 @@ def te_ppr_statistics(request: HttpRequest) -> HttpResponse:
         p.basic_info.get_values_as_list()
         + p.ppr_stats.get_values_as_list()
         + p.receiver_stats.get_values_as_list()
+        + p.advanced_receiver_stats.get_values_as_list()
+        + p.team_target_share_stats.get_values_as_list(p.basic_info.position)
+        + p.snap_share_stats.get_values_as_list()
         for p in players
     ]
     row_headers = (
         BasicInfo.all_stat_labels()
         + PPRStats.all_stat_labels()
         + ReceivingStats.all_stat_labels()
+        + AdvancedReceivingStats.all_stat_labels()
+        + TeamTargetShareStats.all_stat_labels("TE")
+        + SnapShareStats.all_stat_labels()
     )
 
     return render(

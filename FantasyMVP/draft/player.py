@@ -753,28 +753,43 @@ class KickerStats:
 @dataclasses.dataclass
 class SnapShareStats:
     snaps_per_game: float
+    second_half_snaps_per_game: float
     snap_pct: float
+    second_half_snap_pct: float
     util_pct: float
+    second_half_util_pct: float
     pts_100_snap: float
+    second_half_pts_100_snap: float
     ppr_pts_100_snap: float
+    second_half_ppr_pts_100_snap: float
 
     def get_values_as_list(self) -> typing.List[typing.Any]:
         return [
             self.snaps_per_game,
+            self.second_half_snaps_per_game,
             self.snap_pct,
+            self.second_half_snap_pct,
             self.util_pct,
+            self.second_half_util_pct,
             self.pts_100_snap,
+            self.second_half_pts_100_snap,
             self.ppr_pts_100_snap,
+            self.second_half_ppr_pts_100_snap,
         ]
 
     @staticmethod
     def all_stat_labels() -> typing.List[str]:
         return [
             "Snaps per Game",
+            "Second Half Snaps per Game",
             "Snap %",
+            "Second Half Snap %",
             "Utilization %",
+            "Second Half Utilization %",
             "Points per 100 Snaps",
+            "Second Half Points per 100 Snaps",
             "PPR Points per 100 Snaps",
+            "Second Half PPR Points per 100 Snaps",
         ]
 
     @staticmethod
@@ -785,6 +800,11 @@ class SnapShareStats:
             util_pct=row["UTIL_PCT"],
             pts_100_snap=row["PTS_100_SNAP"],
             ppr_pts_100_snap=row["PPR_PTS_100_SNAP"],
+            second_half_snaps_per_game=row["SECOND_HALF_SNAPS_PER_GAME"],
+            second_half_snap_pct=row["SECOND_HALF_SNAP_PCT"],
+            second_half_util_pct=row["SECOND_HALF_UTIL_PCT"],
+            second_half_pts_100_snap=row["SECOND_HALF_PTS_100_SNAP"],
+            second_half_ppr_pts_100_snap=row["SECOND_HALF_PPR_PTS_100_SNAP"],
         )
 
 

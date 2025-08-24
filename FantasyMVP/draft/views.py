@@ -255,6 +255,7 @@ def rb_ppr_statistics(request: HttpRequest) -> HttpResponse:
         + p.runningback_stats.get_values_as_list()
         + p.receiver_stats.get_values_as_list()
         + p.team_target_share_stats.get_values_as_list(p.basic_info.position)
+        + p.snap_share_stats.get_values_as_list()
         for p in players
     ]
     row_headers = (

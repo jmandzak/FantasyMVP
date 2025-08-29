@@ -35,10 +35,10 @@ def _get_players(position) -> typing.List[Player]:
 
 
 def _get_row_values(
-    players: typing.List[Player], position: str
+    players: typing.List[Player], position: str, ppr: bool = PPR
 ) -> typing.List[typing.List[str]]:
     row_values = [
-        p.basic_info.get_values_as_list() + p.scoring_based_stats(PPR) for p in players
+        p.basic_info.get_values_as_list() + p.scoring_based_stats(ppr) for p in players
     ]
     if position != "all":
         for row, player in zip(row_values, players):
@@ -47,9 +47,9 @@ def _get_row_values(
 
 
 def _get_column_headers(
-    players: typing.List[Player], position: str
+    players: typing.List[Player], position: str, ppr: bool = PPR
 ) -> typing.List[str]:
-    header_labels = BasicInfo.all_stat_labels() + players[0].scoring_based_labels(PPR)
+    header_labels = BasicInfo.all_stat_labels() + players[0].scoring_based_labels(ppr)
     if position != "all":
         header_labels.extend(players[0].position_based_labels())
     return header_labels
@@ -163,12 +163,9 @@ def live_draft(request: HttpRequest) -> HttpResponse:
 
 def all_statistics(request: HttpRequest) -> HttpResponse:
     players = read_player_stats(settings.CSV_FILE_PATH)
-    players = sort_players(players, False).values()
-    row_values = [
-        p.basic_info.get_values_as_list() + p.standard_stats.get_values_as_list()
-        for p in players
-    ]
-    row_headers = BasicInfo.all_stat_labels() + StandardStats.all_stat_labels()
+    players = list(sort_players(players, False).values())
+    row_values = _get_row_values(players, "all", ppr=False)
+    row_headers = _get_column_headers(players, "all", ppr=False)
 
     return render(
         request,
@@ -179,12 +176,9 @@ def all_statistics(request: HttpRequest) -> HttpResponse:
 
 def all_ppr_statistics(request: HttpRequest) -> HttpResponse:
     players = read_player_stats(settings.CSV_FILE_PATH)
-    players = sort_players(players, True).values()
-    row_values = [
-        p.basic_info.get_values_as_list() + p.ppr_stats.get_values_as_list()
-        for p in players
-    ]
-    row_headers = BasicInfo.all_stat_labels() + PPRStats.all_stat_labels()
+    players = list(sort_players(players, True).values())
+    row_values = _get_row_values(players, "all", ppr=True)
+    row_headers = _get_column_headers(players, "all", ppr=True)
 
     return render(
         request,
@@ -197,17 +191,8 @@ def qb_statistics(request: HttpRequest) -> HttpResponse:
     players = read_player_stats(settings.CSV_FILE_PATH)
     players = sort_players(players, False).values()
     players = [p for p in players if p.basic_info.position == "QB"]
-    row_values = [
-        p.basic_info.get_values_as_list()
-        + p.ppr_stats.get_values_as_list()
-        + p.quarterback_stats.get_values_as_list()
-        for p in players
-    ]
-    row_headers = (
-        BasicInfo.all_stat_labels()
-        + PPRStats.all_stat_labels()
-        + PassingStats.all_stat_labels()
-    )
+    row_values = _get_row_values(players, players[0].basic_info.position)
+    row_headers = _get_column_headers(players, players[0].basic_info.position)
 
     return render(
         request,
@@ -220,23 +205,8 @@ def rb_statistics(request: HttpRequest) -> HttpResponse:
     players = read_player_stats(settings.CSV_FILE_PATH)
     players = sort_players(players, False).values()
     players = [p for p in players if p.basic_info.position == "RB"]
-    row_values = [
-        p.basic_info.get_values_as_list()
-        + p.standard_stats.get_values_as_list()
-        + p.runningback_stats.get_values_as_list()
-        + p.receiver_stats.get_values_as_list()
-        + p.team_target_share_stats.get_values_as_list(p.basic_info.position)
-        + p.snap_share_stats.get_values_as_list()
-        for p in players
-    ]
-    row_headers = (
-        BasicInfo.all_stat_labels()
-        + StandardStats.all_stat_labels()
-        + RushingStats.all_stat_labels()
-        + ReceivingStats.all_stat_labels()
-        + TeamTargetShareStats.all_stat_labels("RB")
-        + SnapShareStats.all_stat_labels()
-    )
+    row_values = _get_row_values(players, players[0].basic_info.position, ppr=False)
+    row_headers = _get_column_headers(players, players[0].basic_info.position, ppr=False)
 
     return render(
         request,
@@ -249,23 +219,8 @@ def rb_ppr_statistics(request: HttpRequest) -> HttpResponse:
     players = read_player_stats(settings.CSV_FILE_PATH)
     players = sort_players(players, True).values()
     players = [p for p in players if p.basic_info.position == "RB"]
-    row_values = [
-        p.basic_info.get_values_as_list()
-        + p.ppr_stats.get_values_as_list()
-        + p.runningback_stats.get_values_as_list()
-        + p.receiver_stats.get_values_as_list()
-        + p.team_target_share_stats.get_values_as_list(p.basic_info.position)
-        + p.snap_share_stats.get_values_as_list()
-        for p in players
-    ]
-    row_headers = (
-        BasicInfo.all_stat_labels()
-        + PPRStats.all_stat_labels()
-        + RushingStats.all_stat_labels()
-        + ReceivingStats.all_stat_labels()
-        + TeamTargetShareStats.all_stat_labels("RB")
-        + SnapShareStats.all_stat_labels()
-    )
+    row_values = _get_row_values(players, players[0].basic_info.position, ppr=True)
+    row_headers = _get_column_headers(players, players[0].basic_info.position, ppr=True)
 
     return render(
         request,
@@ -278,23 +233,8 @@ def wr_statistics(request: HttpRequest) -> HttpResponse:
     players = read_player_stats(settings.CSV_FILE_PATH)
     players = sort_players(players, False).values()
     players = [p for p in players if p.basic_info.position == "WR"]
-    row_values = [
-        p.basic_info.get_values_as_list()
-        + p.standard_stats.get_values_as_list()
-        + p.receiver_stats.get_values_as_list()
-        + p.advanced_receiver_stats.get_values_as_list()
-        + p.team_target_share_stats.get_values_as_list(p.basic_info.position)
-        + p.snap_share_stats.get_values_as_list()
-        for p in players
-    ]
-    row_headers = (
-        BasicInfo.all_stat_labels()
-        + StandardStats.all_stat_labels()
-        + ReceivingStats.all_stat_labels()
-        + AdvancedReceivingStats.all_stat_labels()
-        + TeamTargetShareStats.all_stat_labels("WR")
-        + SnapShareStats.all_stat_labels()
-    )
+    row_values = _get_row_values(players, players[0].basic_info.position, ppr=False)
+    row_headers = _get_column_headers(players, players[0].basic_info.position, ppr=False)
 
     return render(
         request,
@@ -307,23 +247,8 @@ def wr_ppr_statistics(request: HttpRequest) -> HttpResponse:
     players = read_player_stats(settings.CSV_FILE_PATH)
     players = sort_players(players, True).values()
     players = [p for p in players if p.basic_info.position == "WR"]
-    row_values = [
-        p.basic_info.get_values_as_list()
-        + p.ppr_stats.get_values_as_list()
-        + p.receiver_stats.get_values_as_list()
-        + p.advanced_receiver_stats.get_values_as_list()
-        + p.team_target_share_stats.get_values_as_list(p.basic_info.position)
-        + p.snap_share_stats.get_values_as_list()
-        for p in players
-    ]
-    row_headers = (
-        BasicInfo.all_stat_labels()
-        + PPRStats.all_stat_labels()
-        + ReceivingStats.all_stat_labels()
-        + AdvancedReceivingStats.all_stat_labels()
-        + TeamTargetShareStats.all_stat_labels("WR")
-        + SnapShareStats.all_stat_labels()
-    )
+    row_values = _get_row_values(players, players[0].basic_info.position, ppr=True)
+    row_headers = _get_column_headers(players, players[0].basic_info.position, ppr=True)
 
     return render(
         request,
@@ -336,23 +261,8 @@ def te_statistics(request: HttpRequest) -> HttpResponse:
     players = read_player_stats(settings.CSV_FILE_PATH)
     players = sort_players(players, False).values()
     players = [p for p in players if p.basic_info.position == "TE"]
-    row_values = [
-        p.basic_info.get_values_as_list()
-        + p.standard_stats.get_values_as_list()
-        + p.receiver_stats.get_values_as_list()
-        + p.advanced_receiver_stats.get_values_as_list()
-        + p.team_target_share_stats.get_values_as_list(p.basic_info.position)
-        + p.snap_share_stats.get_values_as_list()
-        for p in players
-    ]
-    row_headers = (
-        BasicInfo.all_stat_labels()
-        + StandardStats.all_stat_labels()
-        + ReceivingStats.all_stat_labels()
-        + AdvancedReceivingStats.all_stat_labels()
-        + TeamTargetShareStats.all_stat_labels("TE")
-        + SnapShareStats.all_stat_labels()
-    )
+    row_values = _get_row_values(players, players[0].basic_info.position, ppr=False)
+    row_headers = _get_column_headers(players, players[0].basic_info.position, ppr=False)
 
     return render(
         request,
@@ -365,23 +275,8 @@ def te_ppr_statistics(request: HttpRequest) -> HttpResponse:
     players = read_player_stats(settings.CSV_FILE_PATH)
     players = sort_players(players, True).values()
     players = [p for p in players if p.basic_info.position == "TE"]
-    row_values = [
-        p.basic_info.get_values_as_list()
-        + p.ppr_stats.get_values_as_list()
-        + p.receiver_stats.get_values_as_list()
-        + p.advanced_receiver_stats.get_values_as_list()
-        + p.team_target_share_stats.get_values_as_list(p.basic_info.position)
-        + p.snap_share_stats.get_values_as_list()
-        for p in players
-    ]
-    row_headers = (
-        BasicInfo.all_stat_labels()
-        + PPRStats.all_stat_labels()
-        + ReceivingStats.all_stat_labels()
-        + AdvancedReceivingStats.all_stat_labels()
-        + TeamTargetShareStats.all_stat_labels("TE")
-        + SnapShareStats.all_stat_labels()
-    )
+    row_values = _get_row_values(players, players[0].basic_info.position, ppr=True)
+    row_headers = _get_column_headers(players, players[0].basic_info.position, ppr=True)
 
     return render(
         request,
@@ -394,17 +289,8 @@ def k_statistics(request: HttpRequest) -> HttpResponse:
     players = read_player_stats(settings.CSV_FILE_PATH)
     players = sort_players(players, False).values()
     players = [p for p in players if p.basic_info.position == "K"]
-    row_values = [
-        p.basic_info.get_values_as_list()
-        + p.ppr_stats.get_values_as_list()
-        + p.kicker_stats.get_values_as_list()
-        for p in players
-    ]
-    row_headers = (
-        BasicInfo.all_stat_labels()
-        + PPRStats.all_stat_labels()
-        + KickerStats.all_stat_labels()
-    )
+    row_values = _get_row_values(players, players[0].basic_info.position, ppr=False)
+    row_headers = _get_column_headers(players, players[0].basic_info.position, ppr=False)
 
     return render(
         request,
@@ -417,17 +303,8 @@ def def_statistics(request: HttpRequest) -> HttpResponse:
     players = read_player_stats(settings.CSV_FILE_PATH)
     players = sort_players(players, False).values()
     players = [p for p in players if p.basic_info.position == "DEF"]
-    row_values = [
-        p.basic_info.get_values_as_list()
-        + p.ppr_stats.get_values_as_list()
-        + p.defense_stats.get_values_as_list()
-        for p in players
-    ]
-    row_headers = (
-        BasicInfo.all_stat_labels()
-        + PPRStats.all_stat_labels()
-        + DefenseStats.all_stat_labels()
-    )
+    row_values = _get_row_values(players, players[0].basic_info.position, ppr=False)
+    row_headers = _get_column_headers(players, players[0].basic_info.position, ppr=False)
 
     return render(
         request,

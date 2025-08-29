@@ -23,6 +23,7 @@ class Player:
         self.snap_share_stats = SnapShareStats.from_csv_row(csv_row)
         self.team_target_share_stats = TeamTargetShareStats.from_csv_row(csv_row)
         self.advanced_receiver_stats = AdvancedReceivingStats.from_csv_row(csv_row)
+        self.advanced_running_stats = AdvancedRushingStats.from_csv_row(csv_row)
 
     def scoring_based_stats(self, ppr: bool) -> typing.List[typing.Any]:
         if ppr:
@@ -38,6 +39,7 @@ class Player:
         if self.basic_info.position == "RB":
             return (
                 self.runningback_stats.get_values_as_list()
+                + self.advanced_running_stats.get_values_as_list()
                 + self.receiver_stats.get_values_as_list()
                 + self.snap_share_stats.get_values_as_list()
                 + self.team_target_share_stats.get_values_as_list(
@@ -70,11 +72,18 @@ class Player:
         if self.basic_info.position == "RB":
             return (
                 RushingStats.all_stat_labels()
+                + AdvancedRushingStats.all_stat_labels()
                 + ReceivingStats.all_stat_labels()
+                + TeamTargetShareStats.all_stat_labels(self.basic_info.position)
                 + SnapShareStats.all_stat_labels()
             )
         if self.basic_info.position in ["WR", "TE"]:
-            return ReceivingStats.all_stat_labels() + SnapShareStats.all_stat_labels()
+            return (
+                ReceivingStats.all_stat_labels()
+                + AdvancedReceivingStats.all_stat_labels()
+                + TeamTargetShareStats.all_stat_labels(self.basic_info.position)
+                + SnapShareStats.all_stat_labels()
+            )
         if self.basic_info.position == "DEF":
             return DefenseStats.all_stat_labels()
         if self.basic_info.position == "K":
@@ -230,6 +239,60 @@ class RushingStats:
     rush_percent_20: float
     rush_percent_10: float
     rush_percent_5: float
+
+    def get_values_as_list(self) -> typing.List[typing.Any]:
+        return [
+            self.attempts,
+            self.touchdowns,
+            self.yards,
+            self.average_attempts,
+            self.average_touchdowns,
+            self.average_yards,
+            self.rush_attempts_20,
+            self.rush_attempts_10,
+            self.rush_attempts_5,
+            self.rush_percent_20,
+            self.rush_percent_10,
+            self.rush_percent_5,
+        ]
+
+    @staticmethod
+    def all_stat_labels() -> typing.List[str]:
+        return [
+            "Rushing Attempts",
+            "Rushing Touchdowns",
+            "Rushing Yards",
+            "Average Rushing Attempts",
+            "Average Rushing Touchdowns",
+            "Average Rushing Yards",
+            "Rush Attempts from 20",
+            "Rush Attempts from 10",
+            "Rush Attempts from 5",
+            "Rush Percent from 20",
+            "Rush Percent from 10",
+            "Rush Percent from 5",
+        ]
+
+    @staticmethod
+    def from_csv_row(row: typing.Dict[str, typing.Any]) -> RushingStats:
+        return RushingStats(
+            attempts=row["RUSH_ATT"],
+            touchdowns=row["RUSH_TDS"],
+            yards=row["RUSH_YDS"],
+            average_attempts=row["AVG_RUSH_ATT"],
+            average_touchdowns=row["AVG_RUSH_TDS"],
+            average_yards=row["AVG_RUSH_YDS"],
+            rush_attempts_20=row["20_YD_ATT"],
+            rush_attempts_10=row["10_YD_ATT"],
+            rush_attempts_5=row["5_YD_ATT"],
+            rush_percent_20=row["20_YD_%RUSH"],
+            rush_percent_10=row["10_YD_%RUSH"],
+            rush_percent_5=row["5_YD_%RUSH"],
+        )
+
+
+@dataclasses.dataclass
+class AdvancedRushingStats:
     yds_before_contact: int
     avg_yds_before_contact: float
     yds_after_contact: int
@@ -252,18 +315,6 @@ class RushingStats:
 
     def get_values_as_list(self) -> typing.List[typing.Any]:
         return [
-            self.attempts,
-            self.touchdowns,
-            self.yards,
-            self.average_attempts,
-            self.average_touchdowns,
-            self.average_yards,
-            self.rush_attempts_20,
-            self.rush_attempts_10,
-            self.rush_attempts_5,
-            self.rush_percent_20,
-            self.rush_percent_10,
-            self.rush_percent_5,
             self.yds_before_contact,
             self.avg_yds_before_contact,
             self.yds_after_contact,
@@ -288,18 +339,6 @@ class RushingStats:
     @staticmethod
     def all_stat_labels() -> typing.List[str]:
         return [
-            "Rushing Attempts",
-            "Rushing Touchdowns",
-            "Rushing Yards",
-            "Average Rushing Attempts",
-            "Average Rushing Touchdowns",
-            "Average Rushing Yards",
-            "Rush Attempts from 20",
-            "Rush Attempts from 10",
-            "Rush Attempts from 5",
-            "Rush Percent from 20",
-            "Rush Percent from 10",
-            "Rush Percent from 5",
             "Yards Before Contact",
             "Avg Yards Before Contact",
             "Yards After Contact",
@@ -322,20 +361,8 @@ class RushingStats:
         ]
 
     @staticmethod
-    def from_csv_row(row: typing.Dict[str, typing.Any]) -> RushingStats:
-        return RushingStats(
-            attempts=row["RUSH_ATT"],
-            touchdowns=row["RUSH_TDS"],
-            yards=row["RUSH_YDS"],
-            average_attempts=row["AVG_RUSH_ATT"],
-            average_touchdowns=row["AVG_RUSH_TDS"],
-            average_yards=row["AVG_RUSH_YDS"],
-            rush_attempts_20=row["20_YD_ATT"],
-            rush_attempts_10=row["10_YD_ATT"],
-            rush_attempts_5=row["5_YD_ATT"],
-            rush_percent_20=row["20_YD_%RUSH"],
-            rush_percent_10=row["10_YD_%RUSH"],
-            rush_percent_5=row["5_YD_%RUSH"],
+    def from_csv_row(row: typing.Dict[str, typing.Any]) -> AdvancedRushingStats:
+        return AdvancedRushingStats(
             yds_before_contact=row["YDS_BEFORE_CONTACT"],
             avg_yds_before_contact=row["AVG_YDS_BEFORE_CONTACT"],
             yds_after_contact=row["YDS_AFTER_CONTACT"],

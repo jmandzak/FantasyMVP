@@ -41,19 +41,19 @@ class Player:
                 self.runningback_stats.get_values_as_list()
                 + self.advanced_running_stats.get_values_as_list()
                 + self.receiver_stats.get_values_as_list()
-                + self.snap_share_stats.get_values_as_list()
                 + self.team_target_share_stats.get_values_as_list(
                     self.basic_info.position
                 )
+                + self.snap_share_stats.get_values_as_list()
             )
         if self.basic_info.position in ["WR", "TE"]:
             return (
                 self.receiver_stats.get_values_as_list()
-                + self.snap_share_stats.get_values_as_list()
                 + self.advanced_receiver_stats.get_values_as_list()
                 + self.team_target_share_stats.get_values_as_list(
                     self.basic_info.position
                 )
+                + self.snap_share_stats.get_values_as_list()
             )
         if self.basic_info.position == "DEF":
             return self.defense_stats.get_values_as_list()
